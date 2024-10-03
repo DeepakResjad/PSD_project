@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Ticket</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="./index.html">Ticketing System</a>
+        <a class="navbar-brand" href="./TicketList.html">Tickets</a>
+        <a class="navbar-brand" href="./SubmitTicket.html">Create</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Sign Up</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+  <div class="container mt-5">
+    <h2 class="text-center">Submit a Ticket</h2>
+    <form id="ticketForm">
+      <div class="form-group">
+        <label for="userId">User ID</label>
+        <input type="number" class="form-control" id="userId" placeholder="Enter your User ID" required>
+      </div>
+      <div class="form-group">
+        <label for="softwareName">Software Name</label>
+        <input type="text" class="form-control" id="softwareName" placeholder="Enter software name" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit Ticket</button>
+    </form>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#ticketForm').on('submit', function(event) {
+        event.preventDefault();
+        
+        // Get form data
+        const userId = $('#userId').val();
+        const softwareName = $('#softwareName').val();
+
+        // Send AJAX request to submit the ticket
+        $.ajax({
+          url: '/api/tickets',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ user_id: userId, software_name: softwareName }),
+          success: function(response) {
+            alert('Ticket submitted successfully! Ticket ID: ' + response.ticket_id);
+          },
+          error: function(error) {
+            alert('Error submitting ticket: ' + error.responseJSON.error);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
