@@ -61,7 +61,18 @@ def get_user(username):
 # Endpoint for homepage
 @app.route('/')
 def home():
-    return 'Welcome to the Ticketing System!'
+    return render_template('index.html')  # Keep this for rendering the HTML page
+
+# Endpoint for the Submit Ticket page
+@app.route('/submit-ticket')
+def submit_ticket_page():
+    return render_template('SubmitTicket.html')
+
+# Endpoint for the Ticket List page
+@app.route('/ticket-list')
+def ticket_list_page():
+    return render_template('TicketList.html')
+
 
 # Handle favicon.ico request
 @app.route('/favicon.ico')
@@ -177,10 +188,6 @@ def submit_ticket():
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
-
-@app.route('/')
-def home():
-    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
