@@ -5,23 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT Ticketing Solution</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #007bff;
+      padding: 15px;
+    }
+
+    .navbar-brand {
+      color: #fff !important;
+      font-size: 1.2rem;
+    }
+
+    .navbar-brand:hover {
+      color: #ffeb3b !important;
+    }
+
+    .nav-link {
+      color: #fff !important;
+    }
+
+    /* Hero Section */
+    .jumbotron {
+      background-image: url('https://example.com/it-support-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      height: 400px;
+    }
+
+    .jumbotron h1 {
+      font-size: 3.5rem;
+      font-weight: bold;
+    }
+
+    /* Icons and buttons */
+    .btn-primary {
+      background-color: #28a745;
+      border: none;
+    }
+
+    /* Section Styles */
+    .features-section {
+      padding: 50px 0;
+      background-color: #ffffff;
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      color: #007bff;
+    }
+
+    .feature-box {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .feature-box h4 {
+      font-weight: 600;
+    }
+
+    footer {
+      background-color: #007bff;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+
   <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="./index.html">Ticketing System</a>
-    <a class="navbar-brand" href="/submit-ticket">Create</a>
-    <a class="navbar-brand" href="/ticket-list">Tickets</a>
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="./index.html"><i class="fas fa-home"></i> Home</a>
+    <a class="navbar-brand" href="/submit-ticket"><i class="fas fa-plus-circle"></i> Create</a>
+    <a class="navbar-brand" href="/ticket-list"><i class="fas fa-ticket-alt"></i> Tickets</a>
+    <a class="navbar-brand" href="/ticketing-system"><i class="fas fa-cogs"></i> Ticketing System</a> 
+
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
+          <a class="nav-link" href="#"><i class="fas fa-sign-in-alt"></i> Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Sign Up</a>
+          <a class="nav-link" href="#"><i class="fas fa-user-plus"></i> Sign Up</a>
         </li>
       </ul>
     </div>
@@ -33,6 +110,32 @@
     <p class="lead">Efficiently manage your IT issues with our streamlined platform.</p>
     <a class="btn btn-primary btn-lg" href="./SubmitTicket.html" role="button">Get Started</a>
   </div>
+
+  <!-- Features Section -->
+  <div class="features-section container">
+    <div class="row">
+      <div class="col-md-4 feature-box">
+        <i class="fas fa-tools feature-icon"></i>
+        <h4>IT Support</h4>
+        <p>Get help with technical issues in real time.</p>
+      </div>
+      <div class="col-md-4 feature-box">
+        <i class="fas fa-laptop-code feature-icon"></i>
+        <h4>Manage Tickets</h4>
+        <p>Track your support requests and stay informed.</p>
+      </div>
+      <div class="col-md-4 feature-box">
+        <i class="fas fa-comments feature-icon"></i>
+        <h4>Collaborate</h4>
+        <p>Work with your team to resolve issues efficiently.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 IT Ticketing Solution. All rights reserved.</p>
+  </footer>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
