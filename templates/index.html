@@ -1,143 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Ticketing Solution</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f6f9;
-      color: #333;
-    }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    /* Navbar */
-    .navbar {
-      background-color: #007bff;
-      padding: 15px;
-    }
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-    .navbar-brand {
-      color: #fff !important;
-      font-size: 1.2rem;
-    }
+        <title>Ticketing System | Login Page</title>
 
-    .navbar-brand:hover {
-      color: #ffeb3b !important;
-    }
+        <!-- CSS FILES -->                
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    .nav-link {
-      color: #fff !important;
-    }
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,700;1,200&family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
+        
+        <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    /* Hero Section */
-    .jumbotron {
-      background-image: url('https://example.com/it-support-bg.jpg');
-      background-size: cover;
-      background-position: center;
-      color: white;
-      height: 400px;
-    }
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
 
-    .jumbotron h1 {
-      font-size: 3.5rem;
-      font-weight: bold;
-    }
+        <link href="css/tooplate-kool-form-pack.css" rel="stylesheet">
+    </head>
+    
+    <body>
 
-    /* Icons and buttons */
-    .btn-primary {
-      background-color: #28a745;
-      border: none;
-    }
+        <main>
 
-    /* Section Styles */
-    .features-section {
-      padding: 50px 0;
-      background-color: #ffffff;
-    }
+            <header class="site-header">
+                <div class="container">
+                    <div class="row justify-content-between align-items-center">
 
-    .feature-icon {
-      font-size: 3rem;
-      color: #007bff;
-    }
+                        <div class="col-lg-12 col-12 d-flex">
+                            <a class="site-header-text d-flex justify-content-center align-items-center me-auto" href="index.html">
+                                <i class="bi-ticket-perforated"></i>
 
-    .feature-box {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+                                <span>
+                                    Ticketing System
+                                </span>
+                            </a>
 
-    .feature-box h4 {
-      font-weight: 600;
-    }
+                            <div class="d-flex">
+                                <a href="login.html" class="custom-btn custom-border-btn btn me-2">Login</a>
+                                <a href="register.html" class="custom-btn custom-border-btn btn">Sign Up</a>
+                            </div>
 
-    footer {
-      background-color: #007bff;
-      color: white;
-      padding: 20px 0;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
+                            <a class="bi-list offcanvas-icon" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu"></a>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="./index.html"><i class="fas fa-home"></i> Home</a>
-    <a class="navbar-brand" href="/submit-ticket"><i class="fas fa-plus-circle"></i> Create</a>
-    <a class="navbar-brand" href="/ticket-list"><i class="fas fa-ticket-alt"></i> Tickets</a>
-    <a class="navbar-brand" href="/ticketing-system"><i class="fas fa-cogs"></i> Ticketing System</a> 
+                        </div>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-sign-in-alt"></i> Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-user-plus"></i> Sign Up</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+                    </div>
+                </div>
+            </header>
 
-  <!-- Hero Section -->
-  <div class="jumbotron text-center">
-    <h1 class="display-4">Welcome to the IT Ticketing Solution</h1>
-    <p class="lead">Efficiently manage your IT issues with our streamlined platform.</p>
-    <a class="btn btn-primary btn-lg" href="./SubmitTicket.html" role="button">Get Started</a>
-  </div>
 
-  <!-- Features Section -->
-  <div class="features-section container">
-    <div class="row">
-      <div class="col-md-4 feature-box">
-        <i class="fas fa-tools feature-icon"></i>
-        <h4>IT Support</h4>
-        <p>Get help with technical issues in real time.</p>
-      </div>
-      <div class="col-md-4 feature-box">
-        <i class="fas fa-laptop-code feature-icon"></i>
-        <h4>Manage Tickets</h4>
-        <p>Track your support requests and stay informed.</p>
-      </div>
-      <div class="col-md-4 feature-box">
-        <i class="fas fa-comments feature-icon"></i>
-        <h4>Collaborate</h4>
-        <p>Work with your team to resolve issues efficiently.</p>
-      </div>
-    </div>
-  </div>
+            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">                
+                <div class="offcanvas-header">                    
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                
+                <div class="offcanvas-body d-flex flex-column justify-content-center align-items-center">
+                    <nav>
+                        <ul>
+                            <li>
+                                <a class="active" href="login.html">Login</a>
+                            </li>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2024 IT Ticketing Solution. All rights reserved.</p>
-  </footer>
+                            <li>
+                                <a href="register.html">Create an Account</a>
+                            </li>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+                            <li>
+                                <a href="my-tickets.html">My Tickets</a>
+                            </li>
+
+                            <li>
+                                <a href="create-ticket.html">Submit a Ticket</a>
+                            </li>
+
+                            <li>
+                                <a href="contact.html">Contact Support</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <section class="hero-section d-flex justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-lg-6 col-12 mx-auto text-center">
+                            <h1 class="hero-title">Welcome to the Ticketing System</h1>
+                            <p class="hero-description">
+                                Our ticketing system simplifies the process of managing events, handling customer queries, and organizing support tickets. Whether you're hosting a major event or providing customer service, our system offers easy-to-use solutions for tracking and managing tickets efficiently.
+                            </p>
+                            <div class="d-flex justify-content-center mt-4">
+                                <a href="login.html" class="btn custom-btn custom-border-btn me-2">Login</a>
+                                <a href="register.html" class="btn custom-btn custom-border-btn">Sign Up</a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="video-wrap">
+                    <video autoplay="" loop="" muted="" class="custom-video" poster="">
+                        <source src="videos/ticketing-intro.mp4" type="video/mp4">
+
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </section>
+        </main>
+
+        <!-- JAVASCRIPT FILES -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script src="js/countdown.js"></script>
+        <script src="js/init.js"></script>
+
+    </body>
 </html>
