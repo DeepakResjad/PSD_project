@@ -14,8 +14,8 @@ def get_db_connection():
     conn = psycopg2.connect(
         host="localhost",
         database="ticketing_db",
-        user="your_db_user",
-        password="your_password"
+        user="postgres",
+        password="11b09postgres"
     )
     return conn
 
@@ -64,12 +64,12 @@ def home():
     return render_template('index.html')  # Keep this for rendering the HTML page
 
 # Endpoint for the Submit Ticket page
-@app.route('/submit-ticket')
+@app.route('/SubmitTicket')
 def submit_ticket_page():
     return render_template('SubmitTicket.html')
 
 # Endpoint for the Ticket List page
-@app.route('/ticket-list')
+@app.route('/TicketList')
 def ticket_list_page():
     return render_template('TicketList.html')
 

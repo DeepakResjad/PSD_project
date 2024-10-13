@@ -8,9 +8,9 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="./index.html">Ticketing System</a>
-        <a class="navbar-brand" href="./TicketList.html">Tickets</a>
-        <a class="navbar-brand" href="./SubmitTicket.html">Create</a>
+        <a class="navbar-brand" href="/">Ticketing System</a>
+        <a class="navbar-brand" href="/SubmitTicket">Create</a>
+        <a class="navbar-brand" href="/TicketList">Tickets</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -30,17 +30,18 @@
     <form id="ticketForm">
       <div class="form-group">
         <label for="userId">User ID</label>
-        <input type="number" class="form-control" id="userId" placeholder="Enter your User ID" required>
+        <input type="number" class="form-control" id="userId" name="user_id" placeholder="Enter your User ID" required>
       </div>
       <div class="form-group">
         <label for="softwareName">Software Name</label>
-        <input type="text" class="form-control" id="softwareName" placeholder="Enter software name" required>
+        <input type="text" class="form-control" id="softwareName" name="software_name" placeholder="Enter software name" required>
       </div>
       <button type="submit" class="btn btn-primary">Submit Ticket</button>
     </form>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- jQuery and AJAX script to handle form submission -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#ticketForm').on('submit', function(event) {
@@ -52,12 +53,16 @@
 
         // Send AJAX request to submit the ticket
         $.ajax({
-          url: '/api/tickets',
+          url: '/api/tickets',  // Backend API endpoint
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify({ user_id: userId, software_name: softwareName }),
+          data: JSON.stringify({ 
+            user_id: userId, 
+            software_name: softwareName 
+          }),
           success: function(response) {
             alert('Ticket submitted successfully! Ticket ID: ' + response.ticket_id);
+            $('#ticketForm')[0].reset();  // Clear the form after successful submission
           },
           error: function(error) {
             alert('Error submitting ticket: ' + error.responseJSON.error);
