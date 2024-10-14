@@ -52,11 +52,14 @@ def get_user(username):
     return user
 
 # Endpoint for homepage
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# Define the register route
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 @app.route('/login')
 def login():
