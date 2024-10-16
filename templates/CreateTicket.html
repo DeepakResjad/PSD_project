@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <meta name="description" content="">
         <meta name="author" content="">
 
@@ -19,9 +18,7 @@
     </head>
 
     <body>
-
         <main>
-
             <header class="site-header">
                 <div class="container">
                     <div class="row justify-content-between align-items-center">
@@ -62,13 +59,12 @@
             <section class="hero-section d-flex justify-content-center align-items-center">
                 <div class="container">
                     <div class="row">
-
                         <div class="col-lg-8 col-12 mx-auto text-center">
                             <h1 class="hero-title">Submit a New Ticket</h1>
                             <p class="hero-description">Submit a new ticket to our support team for assistance.</p>
 
                             <!-- Submit Ticket Form -->
-                            <form action="submit_ticket.php" method="post" class="custom-form mt-4" id="ticketForm">
+                            <form class="custom-form mt-4" id="ticketForm" method="POST">
                                 
                                 <div class="form-group mb-3">
                                     <label for="userId">User ID</label>
@@ -82,28 +78,16 @@
 
                                 <div class="form-group mb-3">
                                     <label for="Description">Describe your issue:</label>
-                                    <textarea id="Description" name="description" class="form-control" rows="5" placeholder="Describe your issue" required></textarea>
+                                    <textarea id="Description" name="description" rows="5" placeholder="Describe your issue" required></textarea>
                                 </div>
-
-                                <!-- <div class="form-group mb-3">
-                                    <select name="priority" class="form-control" required>
-                                        <option value="" disabled selected>Select Priority</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                        <option value="High">High</option>
-                                        <option value="Critical">Critical</option>
-                                    </select>
-                                </div> -->
 
                                 <button type="submit" class="btn custom-btn custom-border-btn w-100">Submit Ticket</button>
                             </form>
 
                         </div>
-
                     </div>
                 </div>
             </section>
-
         </main>
 
         <!-- JAVASCRIPT FILES -->
@@ -119,7 +103,7 @@
                 // Get form data
                 const userId = $('#userId').val();
                 const softwareName = $('#softwareName').val();
-                const description = $('#Description').val();  // Assuming 'Description' is the ID of the textarea for the ticket message
+                const description = $('#Description').val();
           
                 // Send AJAX request to submit the ticket
                 $.ajax({
