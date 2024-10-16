@@ -76,10 +76,8 @@ def login():
 def my_tickets():
     return render_template('MyTickets.html')
 
-@app.route('/CreateTicket', methods=['GET'])
+@app.route('/CreateTicket')
 def create_ticket():
-    if request.method == 'POST':
-        return "This route does not accept direct POST submissions", 405
     return render_template('CreateTicket.html')
 
 @app.route('/contact')
