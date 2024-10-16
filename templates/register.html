@@ -30,23 +30,19 @@
             <header class="site-header">
                 <div class="container">
                     <div class="row justify-content-between align-items-center">
-
                         <div class="col-lg-12 col-12 d-flex">
-                            <a class="site-header-text d-flex justify-content-center align-items-center me-auto" href="index.html">
+                            <a class="site-header-text d-flex justify-content-center align-items-center me-auto" href="/">
                                 <i class="bi-ticket-perforated"></i>
-
-                                <span>
-                                    Ticketing System
-                                </span>
+                                <span>Ticketing System</span>
                             </a>
 
                             <div class="d-flex">
-                                <a href="login.html" class="custom-btn custom-border-btn btn me-2">Login</a>
-                                <a href="register.html" class="custom-btn custom-border-btn btn">Sign Up</a>
+                                <!-- Ensure these hrefs point to correct Flask routes -->
+                                <a href="/login" class="custom-btn custom-border-btn btn me-2">Login</a>
+                                <a href="/register" class="custom-btn custom-border-btn btn">Sign Up</a>
                             </div>
 
                             <a class="bi-list offcanvas-icon" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu"></a>
-
                         </div>
 
                     </div>
@@ -54,33 +50,20 @@
             </header>
 
 
-            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">                
-                <div class="offcanvas-header">                    
+            <!-- Off-canvas Menu -->
+            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+                <div class="offcanvas-header">
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                
                 <div class="offcanvas-body d-flex flex-column justify-content-center align-items-center">
                     <nav>
                         <ul>
-                            <li>
-                                <a href="login.html">Login</a>
-                            </li>
-
-                            <li>
-                                <a class="active" href="register.html">Create an Account</a>
-                            </li>
-
-                            <li>
-                                <a href="my-tickets.html">My Tickets</a>
-                            </li>
-
-                            <li>
-                                <a href="create-ticket.html">Submit a Ticket</a>
-                            </li>
-
-                            <li>
-                                <a href="contact.html">Contact Support</a>
-                            </li>
+                            <li><a class="active" href="/">Home</a></li>
+                            <li><a href="/login">Login</a></li>
+                            <li><a href="/register">Create an Account</a></li>
+                            <li><a href="/MyTickets">My Tickets</a></li>
+                            <li><a href="/CreateTicket">Submit a Ticket</a></li>
+                            <li><a href="/contact">Contact Support</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -115,7 +98,7 @@
                                 <button type="submit" class="btn custom-btn custom-border-btn w-100">Sign Up</button>
                             </form>
 
-                            <p class="mt-3">Already have an account? <a href="login.html">Login here</a></p>
+                            <p class="mt-3">Already have an account? <a href="/login">Login here</a></p>
                         </div>
 
                     </div>

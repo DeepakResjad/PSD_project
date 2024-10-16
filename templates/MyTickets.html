@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Ticketing System | Contact Support</title>
+        <title>Ticketing System | My Tickets</title>
 
         <!-- CSS FILES -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,55 +52,85 @@
                             <li><a href="/">Home</a></li>
                             <li><a href="/login">Login</a></li>
                             <li><a href="/register">Create an Account</a></li>
-                            <li><a href="/MyTickets">My Tickets</a></li>
+                            <li><a class="active" href="/MyTickets">My Tickets</a></li>
                             <li><a href="/CreateTicket">Submit a Ticket</a></li>
-                            <li><a class="active" href="/contact">Contact Support</a></li>
+                            <li><a href="/contact">Contact Support</a></li>
                         </ul>
                     </nav>
                 </div>
             </div>
 
-            <!-- Hero Section for Contact Form -->
+            <!-- Main Section -->
             <section class="hero-section d-flex justify-content-center align-items-center">
                 <div class="container">
                     <div class="row">
+                        <div class="col-lg-8 col-12 mx-auto text-center">
+                            <h1 class="hero-title">My Tickets</h1>
+                            <p class="hero-description">Track and manage your submitted tickets below.</p>
 
-                        <div class="col-lg-6 col-12 mx-auto">
-                            <h1 class="hero-title text-center">Contact Support</h1>
-                            <p class="hero-description text-center">Need assistance? Fill out the form below and our support team will get back to you shortly.</p>
-
-                            <form class="custom-form contact-form" role="form" method="post">
-                                <div class="form-floating mb-4 p-0">
-                                    <input type="text" name="name" id="name" class="form-control" placeholder="Full Name" required>
-                                    <label for="name">Full Name</label>
-                                </div>
-
-                                <div class="form-floating mb-4 p-0">
-                                    <input type="email" name="email" id="email" pattern="[^ @]*@[^ @]*" class="form-control" placeholder="Email Address" required>
-                                    <label for="email">Email Address</label>
-                                </div>
-
-                                <div class="form-floating mb-4 p-0">
-                                    <textarea name="message" rows="5" id="message" class="form-control" placeholder="Your Message" required></textarea>
-                                    <label for="message">Your Message</label>
-                                </div>
-
-                                <div class="col-lg-4 col-12 mx-auto">
-                                    <button type="submit" class="form-control">Send Message</button>
-                                </div>
-                            </form>
+                            <table class="table table-striped mt-4">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Ticket ID</th>
+                                        <th scope="col">User ID</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Priority</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Example Ticket Data -->                                    
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
                 </div>
             </section>
 
         </main>
-
+        
         <!-- JAVASCRIPT FILES -->
         <script src="static/js/jquery.min.js"></script>
         <script src="static/js/bootstrap.bundle.min.js"></script>
         <script src="static/js/init.js"></script>
-
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            $(document).ready(function() {
+              function fetchTickets() {
+                $.ajax({
+                  url: '/api/tickets',
+                  type: 'GET',
+                  contentType: 'application/json',
+                  success: function(tickets) {
+                    const tbody = $('#ticketTable tbody');
+                    tbody.empty();  // Clear existing rows
+                    
+                    // Populate the table with ticket data
+                    tickets.forEach(function(ticket) {
+                      tbody.append(`
+                        <tr>
+                          <th scope="row">${ticket.ticket_id}</th>
+                          <td>${ticket.user_id}</td>
+                          <td>${ticket.software_name}</td>
+                          <td>${ticket.ticket_status}</td>
+                          <td>${ticket.priority}</td> <!-- Using the priority from API -->                                    
+                        </tr>
+                      `);
+                    });
+                  },
+                  error: function(error) {
+                    console.error('Error fetching tickets:', error);
+                  }
+                });
+              }
+        
+              // Fetch tickets when the page loads
+              fetchTickets();
+        
+              // Optional: Set an interval to refresh the ticket list every 5 seconds
+              setInterval(fetchTickets, 5000);  // Refresh every 5 seconds
+            });
+        </script>
     </body>
 </html>
