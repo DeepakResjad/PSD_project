@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import hashlib
 import time
 import jwt
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import render_template
+from transformers import pipeline
 
 app = Flask(__name__)
 
@@ -60,19 +60,31 @@ def get_user(username):
 
 # Endpoint for homepage
 @app.route('/')
-def home():
-    return render_template('index.html')  # Keep this for rendering the HTML page
+def index():
+    return render_template('index.html')
 
-# Endpoint for the Submit Ticket page
-@app.route('/SubmitTicket')
-def submit_ticket_page():
-    return render_template('SubmitTicket.html')
+# Define the register route
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
-# Endpoint for the Ticket List page
-@app.route('/TicketList')
-def ticket_list_page():
-    return render_template('TicketList.html')
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
+@app.route('/MyTickets')
+def my_tickets():
+    return render_template('MyTickets.html')
+
+@app.route('/CreateTicket', methods=['GET'])
+def create_ticket():
+    if request.method == 'POST':
+        return "This route does not accept direct POST submissions", 405
+    return render_template('CreateTicket.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
 # Handle favicon.ico request
 @app.route('/favicon.ico')
@@ -165,6 +177,35 @@ def revoke_admin():
     log_admin_action(username, 'Revoked Admin Privileges')
     return jsonify({"message": f"Admin privileges revoked from {username}"}), 200
 
+# Load Hugging Face sentiment analysis model
+sentiment_analysis = pipeline(task="sentiment-analysis", model="SamLowe/roberta-base-go_emotions")
+
+# API to retrieve new tickets 
+@app.route('/api/tickets', methods=['GET'])
+def get_tickets():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    cur.execute("SELECT ticket_id, user_id, software_name, ticket_status FROM tickets")
+    tickets = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    # Create a list of dictionaries to return as JSON
+    ticket_list = []
+    for ticket in tickets:
+        ticket_dict = {
+            'ticket_id': ticket[0],
+            'user_id': ticket[1],
+            'software_name': ticket[2],
+            'ticket_status': ticket[3],
+            'priority': 'Closed' if ticket[3] in ['Closed', 'Resolved'] else 'Open'  # Priority logic
+        }
+        ticket_list.append(ticket_dict)
+
+    return jsonify(ticket_list), 200
+
 # API to submit a ticket
 @app.route('/api/tickets', methods=['POST'])
 def submit_ticket():
@@ -174,8 +215,26 @@ def submit_ticket():
     ticket_status = "Pending"               # Default status for new tickets
     request_time = datetime.now()           # Capture the request time
 
+    # Analyze sentiment of the ticket message (assumed to be part of the request)
+    ticket_message = data.get('message')
+    sentiment_result = sentiment_analysis(ticket_message)
+    sentiment_label = sentiment_result[0]['label']  # 'POSITIVE', 'NEGATIVE', etc.
+    
+    negative_emotions = ['anger', 'sadness', 'grief', 'disgust', 'disappointment', 'worry','annoyance','disapproval','remorse','fear','confusion']
+    # Example: Set ticket status based on sentiment
+    if sentiment_label.lower() in negative_emotions:
+        ticket_status = "Urgent"
+    else:
+        ticket_status = "Low"
+
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (user_id,))
+    user_exists = cur.fetchone()[0]
+
+    if user_exists == 0:
+        return jsonify({"error": "User ID does not exist. Please provide a valid user."}), 400
     
     # Insert a new ticket into the tickets table
     cur.execute(
@@ -188,6 +247,7 @@ def submit_ticket():
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
+
 
 if __name__ == '__main__':
     app.run(debug=True)
