@@ -1,40 +1,108 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Ticketing Solution</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="./index.html">Ticketing System</a>
-    <a class="navbar-brand" href="./TicketList.html">Tickets</a>
-    <a class="navbar-brand" href="./SubmitTicket.html">Create</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Sign Up</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Hero Section -->
-  <div class="jumbotron text-center">
-    <h1 class="display-4">Welcome to the IT Ticketing Solution</h1>
-    <p class="lead">Efficiently manage your IT issues with our streamlined platform.</p>
-    <a class="btn btn-primary btn-lg" href="./SubmitTicket.html" role="button">Get Started</a>
-  </div>
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        <title>Ticketing System | Login Page</title>
+
+        <!-- CSS FILES -->                
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,700;1,200&family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
+
+        <!-- Use Flask's url_for function to load static assets -->
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/tooplate-kool-form-pack.css') }}" rel="stylesheet">
+
+    </head>
+    
+    <body>
+        <main>
+            <header class="site-header">
+                <div class="container">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-lg-12 col-12 d-flex">
+                            <a class="site-header-text d-flex justify-content-center align-items-center me-auto" href="/">
+                                <i class="bi-ticket-perforated"></i>
+                                <span>Ticketing System</span>
+                            </a>
+
+                            <div class="d-flex">
+                                <!-- Ensure these hrefs point to correct Flask routes -->
+                                <a href="/login" class="custom-btn custom-border-btn btn me-2">Login</a>
+                                <a href="/register" class="custom-btn custom-border-btn btn">Sign Up</a>
+                            </div>
+
+                            <a class="bi-list offcanvas-icon" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu"></a>
+                        </div>
+
+                    </div>
+                </div>
+            </header>
+
+
+            <!-- Off-canvas Menu -->
+            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column justify-content-center align-items-center">
+                    <nav>
+                        <ul>
+                            <li><a class="active" href="/">Home</a></li>
+                            <li><a href="/login">Login</a></li>
+                            <li><a href="/register">Create an Account</a></li>
+                            <li><a href="/MyTickets">My Tickets</a></li>
+                            <li><a href="/CreateTicket">Submit a Ticket</a></li>
+                            <li><a href="/contact">Contact Support</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <section class="hero-section d-flex justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-lg-6 col-12 mx-auto text-center">
+                            <h1 class="hero-title">Welcome to the Ticketing System</h1>
+                            <p class="hero-description">
+                                Our ticketing system simplifies the process of managing events, handling customer queries, and organizing support tickets. Whether you're hosting a major event or providing customer service, our system offers easy-to-use solutions for tracking and managing tickets efficiently.
+                            </p>
+                            <div class="d-flex justify-content-center mt-4">
+
+                                <a href="/login" class="btn custom-btn custom-border-btn me-2">Login</a>
+                                <a href="/register" class="btn custom-btn custom-border-btn">Sign Up</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="video-wrap">
+                    <video autoplay="" loop="" muted="" class="custom-video" poster="">
+
+                        <!-- Use url_for to reference the video -->
+                        <source src="{{ url_for('static', filename='videos/ticketing-intro.mp4') }}" type="video/mp4">
+
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </section>
+        </main>
+
+
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/countdown.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/init.js') }}"></script>
+
+    </body>
 </html>
+

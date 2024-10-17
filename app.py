@@ -1,11 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify,redirect, url_for
+from werkzeug.security import generate_password_hash
 import hashlib
 import time
 import jwt
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import render_template
+from transformers import pipeline
 
 app = Flask(__name__)
 
@@ -14,8 +15,8 @@ def get_db_connection():
     conn = psycopg2.connect(
         host="localhost",
         database="ticketing_db",
-        user="your_db_user",
-        password="your_password"
+        user="postgres",
+        password="11b09postgres"
     )
     return conn
 
@@ -60,8 +61,45 @@ def get_user(username):
 
 # Endpoint for homepage
 @app.route('/')
-def home():
-    return 'Welcome to the Ticketing System!'
+def index():
+    return render_template('index.html')
+
+# Define the register route
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        hashed_password = generate_password_hash(password)
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Insert into PostgreSQL
+        cur.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                       (username, email, hashed_password))
+        conn.commit()
+
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/login')
+def login_page():
+    return render_template('login.html')
+
+@app.route('/MyTickets')
+def my_tickets_page():
+    return render_template('MyTickets.html')
+
+@app.route('/CreateTicket', methods=['POST','GET'])
+def create_ticket_page():
+    return render_template('CreateTicket.html')
+
+@app.route('/contact')
+def contact_page():
+    return render_template('contact.html')
 
 # Handle favicon.ico request
 @app.route('/favicon.ico')
@@ -154,33 +192,78 @@ def revoke_admin():
     log_admin_action(username, 'Revoked Admin Privileges')
     return jsonify({"message": f"Admin privileges revoked from {username}"}), 200
 
-# API to submit a ticket
-@app.route('/api/tickets', methods=['POST'])
-def submit_ticket():
-    data = request.json
-    user_id = data.get('user_id')          # User ID should come from the request
-    software_name = data.get('software_name')  # Software name from request
-    ticket_status = "Pending"               # Default status for new tickets
-    request_time = datetime.now()           # Capture the request time
+# Load Hugging Face sentiment analysis model
+sentiment_analysis = pipeline(task="sentiment-analysis", model="SamLowe/roberta-base-go_emotions")
 
+# API to retrieve new tickets 
+@app.route('/api/tickets', methods=['GET'])
+def get_tickets():
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Insert a new ticket into the tickets table
+    cur.execute("SELECT ticket_id, user_id, software_name, ticket_status FROM tickets")
+    tickets = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    
+    # Create a list of dictionaries to return as JSON
+    ticket_list = []
+    for ticket in tickets:
+        ticket_dict = {
+            'ticket_id': ticket[0],
+            'user_id': ticket[1],
+            'software_name': ticket[2],
+            'ticket_status': ticket[3],
+            'priority': 'Closed' if ticket[3] in ['Closed', 'Resolved'] else 'Open'  # Priority logic
+        }
+        ticket_list.append(ticket_dict)
+
+    return jsonify(ticket_list), 200
+
+# API to submit a ticket
+@app.route('/api/tickets', methods=['POST'])
+def create_ticket():
+    data = request.get_json()  # Get JSON data from the request body
+
+    user_id = data.get('user_id')  # Extract user_id from the JSON data
+    software_name = data.get('software_name')  # Extract software_name from the JSON data
+    ticket_message = data.get('message')  # The description or message
+    
+    ticket_status = "Pending"
+    request_time = datetime.now()
+
+    # Sentiment analysis logic
+    sentiment_result = sentiment_analysis(ticket_message)
+    sentiment_label = sentiment_result[0]['label']  # Sentiment result (e.g., 'POSITIVE', 'NEGATIVE')
+
+    negative_emotions = ['anger', 'sadness', 'grief', 'disgust', 'disappointment', 'worry', 'annoyance', 'disapproval', 'remorse', 'fear', 'confusion']
+    ticket_status = "Urgent" if sentiment_label.lower() in negative_emotions else "Low"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Check if the user exists
+    cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (user_id,))
+    user_exists = cur.fetchone()[0]
+
+    if user_exists == 0:
+        return jsonify({"error": "User ID does not exist. Please provide a valid user."}), 400
+
+    # Insert the ticket into the database
     cur.execute(
         "INSERT INTO tickets (user_id, software_name, ticket_status, request_time) VALUES (%s, %s, %s, %s) RETURNING ticket_id",
         (user_id, software_name, ticket_status, request_time)
     )
     ticket_id = cur.fetchone()[0]
     conn.commit()
+
     cur.close()
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

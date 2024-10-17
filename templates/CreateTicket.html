@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Ticketing System | Submit a Ticket</title>
+
+        <!-- CSS FILES -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,700;1,200&family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
+        <link href="static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="static/css/bootstrap-icons.css" rel="stylesheet">
+        <link href="static/css/tooplate-kool-form-pack.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <main>
+            <header class="site-header">
+                <div class="container">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-lg-12 col-12 d-flex">
+                            <a class="site-header-text d-flex justify-content-center align-items-center me-auto" href="/">
+                                <i class="bi-ticket-perforated"></i>
+                                <span>Ticketing System</span>
+                            </a>
+                            <div class="d-flex">
+                                <a href="/login" class="custom-btn custom-border-btn btn me-2">Login</a>
+                                <a href="/register" class="custom-btn custom-border-btn btn">Sign Up</a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Off-canvas Menu -->
+            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column justify-content-center align-items-center">
+                    <nav>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/login">Login</a></li>
+                            <li><a href="/register">Create an Account</a></li>
+                            <li><a href="/MyTickets">My Tickets</a></li>
+                            <li><a class="active" href="/CreateTicket">Submit a Ticket</a></li>
+                            <li><a href="/contact">Contact Support</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <section class="hero-section d-flex justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 col-12 mx-auto text-center">
+                            <h1 class="hero-title">Submit a New Ticket</h1>
+                            <p class="hero-description">Submit a new ticket to our support team for assistance.</p>
+
+                            <!-- Submit Ticket Form -->
+                            <form class="custom-form mt-4" id="ticketForm" method="POST">
+                                
+                                <div class="form-group mb-3">
+                                    <label for="userId">User ID</label>
+                                    <input type="number" class="form-control" id="userId" name="user_id" placeholder="Enter your User ID" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="softwareName">Software Name</label>
+                                    <input type="text" class="form-control" id="softwareName" name="software_name" placeholder="Enter software name" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="Description">Describe your issue:</label>
+                                    <textarea type="text" id="Description" class="form-control" name="description" rows="5" placeholder="Describe your issue" required></textarea>
+                                </div>
+
+                                <button type="submit" class="btn custom-btn custom-border-btn w-100">Submit Ticket</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- JAVASCRIPT FILES -->
+        
+        
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
+        <!-- <script src="static/js/jquery.min.js"></script>
+        <script src="static/js/bootstrap.bundle.min.js"></script>
+        <script src="static/js/init.js"></script> -->
+        <script>
+            $(document).ready(function() {
+                console.log('Document is ready');  // Check if the document is loaded
+        
+                $('#ticketForm').on('submit', function(event) {
+                    event.preventDefault();  // Prevent the form from submitting the default way
+                    console.log('Form submission intercepted');  // Check if the form submit event is intercepted
+                    
+                    // Get form data
+                    const userId = $('#userId').val();
+                    const softwareName = $('#softwareName').val();
+                    const description = $('#Description').val();
+        
+                    console.log('User ID: ' + userId);  // Check if userId is being captured
+                    console.log('Software Name: ' + softwareName);  // Check if softwareName is being captured
+                    console.log('Description: ' + description);  // Check if description is being captured
+        
+                    // Send AJAX request to submit the ticket
+                    $.ajax({
+                        url: '/api/tickets',  // The endpoint in your Flask app
+                        type: 'POST',
+                        contentType: 'application/json',  // Ensure it's JSON
+                        data: JSON.stringify({ 
+                            user_id: userId, 
+                            software_name: softwareName,
+                            message: description  // This is the ticket description/message
+                        }),
+                        beforeSend: function() {
+                            console.log('Sending AJAX request...');  // Check if AJAX is being sent
+                        },
+                        success: function(response) {
+                            console.log('AJAX request successful');  // Check if request was successful
+                            console.log('Response:', response);  // Log the response from the server
+                            alert('Ticket submitted successfully! Ticket ID: ' + response.ticket_id);
+                            $('#ticketForm')[0].reset();  // Clear the form after successful submission
+                        },
+                        error: function(error) {
+                            console.log('AJAX request failed');  // Check if there's an error with the request
+                            console.log('Error:', error);  // Log the error response
+                            alert('Error submitting ticket: ' + error.responseJSON.error);
+                        }
+                    });
+                });
+            });
+        </script>
+        <!-- <script>
+            $(document).ready(function() {
+                $('#ticketForm').on('submit', function(event) {
+                    event.preventDefault();  // Prevent the form from submitting the default way
+                    
+                    // Get form data
+                    const userId = $('#userId').val();
+                    const softwareName = $('#softwareName').val();
+                    const description = $('#Description').val();
+        
+                    // Send AJAX request to submit the ticket
+                    $.ajax({
+                        url: '/api/tickets',  // The endpoint in your Flask app
+                        type: 'POST',
+                        contentType: 'application/json',  // Ensure it's JSON
+                        data: JSON.stringify({ 
+                            user_id: userId, 
+                            software_name: softwareName,
+                            message: description  // This is the ticket description/message
+                        }),
+                        success: function(response) {
+                            alert('Ticket submitted successfully! Ticket ID: ' + response.ticket_id);
+                            $('#ticketForm')[0].reset();  // Clear the form after successful submission
+                        },
+                        error: function(error) {
+                            alert('Error submitting ticket: ' + error.responseJSON.error);
+                        }
+                    });
+                });
+            });
+        </script> -->
+        
+
+    </body>
+</html>
