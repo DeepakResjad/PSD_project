@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,redirect, url_for
+from werkzeug.security import generate_password_hash
 import hashlib
 import time
 import jwt
@@ -64,24 +65,40 @@ def index():
     return render_template('index.html')
 
 # Define the register route
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        hashed_password = generate_password_hash(password)
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Insert into PostgreSQL
+        cur.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                       (username, email, hashed_password))
+        conn.commit()
+
+        return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 @app.route('/login')
-def login():
+def login_page():
     return render_template('login.html')
 
 @app.route('/MyTickets')
-def my_tickets():
+def my_tickets_page():
     return render_template('MyTickets.html')
 
-@app.route('/CreateTicket')
-def create_ticket():
+@app.route('/CreateTicket', methods=['POST','GET'])
+def create_ticket_page():
     return render_template('CreateTicket.html')
 
 @app.route('/contact')
-def contact():
+def contact_page():
     return render_template('contact.html')
 
 # Handle favicon.ico request
@@ -206,45 +223,46 @@ def get_tickets():
 
 # API to submit a ticket
 @app.route('/api/tickets', methods=['POST'])
-def submit_ticket():
-    data = request.json
-    user_id = data.get('user_id')          # User ID should come from the request
-    software_name = data.get('software_name')  # Software name from request
-    ticket_status = "Pending"               # Default status for new tickets
-    request_time = datetime.now()           # Capture the request time
+def create_ticket():
+    data = request.get_json()  # Get JSON data from the request body
 
-    # Analyze sentiment of the ticket message (assumed to be part of the request)
-    ticket_message = data.get('message')
-    sentiment_result = sentiment_analysis(ticket_message)
-    sentiment_label = sentiment_result[0]['label']  # 'POSITIVE', 'NEGATIVE', etc.
+    user_id = data.get('user_id')  # Extract user_id from the JSON data
+    software_name = data.get('software_name')  # Extract software_name from the JSON data
+    ticket_message = data.get('message')  # The description or message
     
-    negative_emotions = ['anger', 'sadness', 'grief', 'disgust', 'disappointment', 'worry','annoyance','disapproval','remorse','fear','confusion']
-    # Example: Set ticket status based on sentiment
-    if sentiment_label.lower() in negative_emotions:
-        ticket_status = "Urgent"
-    else:
-        ticket_status = "Low"
+    ticket_status = "Pending"
+    request_time = datetime.now()
+
+    # Sentiment analysis logic
+    sentiment_result = sentiment_analysis(ticket_message)
+    sentiment_label = sentiment_result[0]['label']  # Sentiment result (e.g., 'POSITIVE', 'NEGATIVE')
+
+    negative_emotions = ['anger', 'sadness', 'grief', 'disgust', 'disappointment', 'worry', 'annoyance', 'disapproval', 'remorse', 'fear', 'confusion']
+    ticket_status = "Urgent" if sentiment_label.lower() in negative_emotions else "Low"
 
     conn = get_db_connection()
     cur = conn.cursor()
-    
+
+    # Check if the user exists
     cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (user_id,))
     user_exists = cur.fetchone()[0]
 
     if user_exists == 0:
         return jsonify({"error": "User ID does not exist. Please provide a valid user."}), 400
-    
-    # Insert a new ticket into the tickets table
+
+    # Insert the ticket into the database
     cur.execute(
         "INSERT INTO tickets (user_id, software_name, ticket_status, request_time) VALUES (%s, %s, %s, %s) RETURNING ticket_id",
         (user_id, software_name, ticket_status, request_time)
     )
     ticket_id = cur.fetchone()[0]
     conn.commit()
+
     cur.close()
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
+
 
 
 if __name__ == '__main__':
