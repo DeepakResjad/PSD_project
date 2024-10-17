@@ -8,17 +8,17 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 def get_db_connection():
-    return psycopg2.connect(
+    conn = psycopg2.connect(
         host="localhost",
         database="ticketing_db",
         user="postgres",
-        password="your_password"
+        password="11b09postgres"
     )
+    return conn
 
 def get_user_credentials(fullname, dob, email):
     conn = get_db_connection()
     cur = conn.cursor()
-    
     try:
         cur.execute("SELECT username, password FROM users WHERE fullname = %s AND dob = %s AND email = %s", (fullname, dob, email))
         user = cur.fetchone()
