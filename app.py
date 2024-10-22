@@ -16,7 +16,7 @@ def get_db_connection():
         host="localhost",
         database="ticketing_db",
         user="postgres",
-        password="11b09postgres"
+        password="Nitish"
     )
     return conn
 
@@ -97,6 +97,25 @@ def my_tickets_page():
 def create_ticket_page():
     return render_template('CreateTicket.html')
 
+@app.route('/login', methods=['GET', 'POST'])
+def login_submit():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Replace the following with your actual authentication logic
+        if email == 'user@example.com' and password == 'password123':  # Replace with real authentication check
+            return redirect(url_for('dashboard'))  # Redirect to dashboard on successful login
+        else:
+            return 'Login Failed', 401  # You can also render an error template instead of returning text
+
+    # Render the login page for GET requests
+    return render_template('login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
 @app.route('/contact')
 def contact_page():
     return render_template('contact.html')
@@ -105,6 +124,7 @@ def contact_page():
 @app.route('/favicon.ico')
 def favicon():
     return '', 204
+
 
 # API to request admin privileges
 @app.route('/api/request-admin', methods=['POST'])
