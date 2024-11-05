@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, jsonify,redirect, url_for
-from werkzeug.security import generate_password_hash
+from flask import Flask, render_template, request, jsonify,redirect, url_for, session
+from werkzeug.security import generate_password_hash,check_password_hash
 import hashlib
 import time
 import jwt
@@ -9,6 +9,9 @@ from psycopg2.extras import RealDictCursor
 from transformers import pipeline
 
 app = Flask(__name__)
+SECRET_KEY = "your_secret_key"  # Define your secret key
+
+app.secret_key = SECRET_KEY  # Set the secret key for session management
 
 # Database connection
 def get_db_connection():
@@ -16,11 +19,11 @@ def get_db_connection():
         host="localhost",
         database="ticketing_db",
         user="postgres",
-        password="Nitish"
+        password="11b09postgres"
     )
     return conn
 
-SECRET_KEY = "your_secret_key"
+
 
 # Simple hash function for password checking
 def hash_secret(secret):
@@ -102,19 +105,47 @@ def login_submit():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        
-        # Replace the following with your actual authentication logic
-        if email == 'user@example.com' and password == 'password123':  # Replace with real authentication check
-            return redirect(url_for('dashboard'))  # Redirect to dashboard on successful login
+
+        # Query user from the PostgreSQL database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT user_id, password_hash FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()  # Fetch one matching row
+        cur.close()
+        conn.close()
+
+        if user:
+            user_id, stored_password_hash = user  # Fetch user_id and password_hash
+
+            # Check if the password matches
+            if check_password_hash(stored_password_hash, password):
+                session['user_id'] = user_id  # Store user ID in session
+                return redirect(url_for('dashboard'))  # Redirect to dashboard on successful login
+            else:
+                return render_template('login.html', error="Invalid email or password"), 401
         else:
-            return 'Login Failed', 401  # You can also render an error template instead of returning text
+            return render_template('login.html', error="Invalid email or password"), 401
 
     # Render the login page for GET requests
     return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    if 'user_id' in session:
+        # Get the logged-in user from the PostgreSQL database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT username, email FROM users WHERE user_id = %s", (session['user_id'],))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if user:
+            username, email = user
+            return render_template('dashboard.html', username=username, email=email)
+    else:
+        return redirect(url_for('login_submit'))  # Redirect to login if user is not logged in
+
 
 @app.route('/contact')
 def contact_page():
