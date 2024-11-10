@@ -459,7 +459,7 @@ strong {
   border-radius: var(--border-radius-large);
   border-width: 2px;
   box-shadow: none;
-  color: var(--p-color);
+  color: black;
   margin-bottom: 20px;
   padding: 10px;
   padding-left: 20px;
