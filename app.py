@@ -26,12 +26,14 @@ def get_db_connection():
     )
     return conn
 
+
 # def get_db_connection():
 #     connection_string = os.getenv('DB_CONNECTION_STRING')  # Retrieve connection string from environment variable
 #     if not connection_string:
 #         raise ValueError("No database connection string found. Ensure DB_CONNECTION_STRING is set.")
 #     conn = psycopg2.connect(connection_string)
 #     return conn
+
 
 
 
