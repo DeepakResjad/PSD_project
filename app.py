@@ -4,9 +4,12 @@ import hashlib
 import time
 import jwt
 from datetime import datetime, timedelta
-import psycopg2
+import os, psycopg2
 from psycopg2.extras import RealDictCursor
 from transformers import pipeline
+from transformers.file_utils import TRANSFORMERS_CACHE
+
+print(TRANSFORMERS_CACHE)
 
 app = Flask(__name__)
 SECRET_KEY = "your_secret_key"  # Define your secret key
@@ -22,6 +25,15 @@ def get_db_connection():
         password="11b09postgres"
     )
     return conn
+
+
+# def get_db_connection():
+#     connection_string = os.getenv('DB_CONNECTION_STRING')  # Retrieve connection string from environment variable
+#     if not connection_string:
+#         raise ValueError("No database connection string found. Ensure DB_CONNECTION_STRING is set.")
+#     conn = psycopg2.connect(connection_string)
+#     return conn
+
 
 
 
@@ -66,6 +78,12 @@ def get_user(username):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# @app.route('/protected')
+# @token_required  # Decorator to enforce token authentication
+# def protected():
+#     return jsonify({'message': 'This is a protected route'}), 200
+
 
 # Define the register route
 @app.route('/register', methods=['GET', 'POST'])
@@ -245,6 +263,7 @@ def revoke_admin():
 
 # Load Hugging Face sentiment analysis model
 sentiment_analysis = pipeline(task="sentiment-analysis", model="SamLowe/roberta-base-go_emotions")
+print("Model loaded successfully:", sentiment_analysis)
 
 # API to retrieve new tickets 
 @app.route('/api/tickets', methods=['GET'])
