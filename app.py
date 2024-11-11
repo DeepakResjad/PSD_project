@@ -8,6 +8,8 @@ import os, psycopg2
 from psycopg2.extras import RealDictCursor
 from transformers import pipeline
 from transformers.file_utils import TRANSFORMERS_CACHE
+# from sklearn.cluster import KMeans
+
 
 print(TRANSFORMERS_CACHE)
 
@@ -299,6 +301,8 @@ def create_ticket():
     user_id = data.get('user_id')  # Extract user_id from the JSON data
     software_name = data.get('software_name')  # Extract software_name from the JSON data
     ticket_message = data.get('message')  # The description or message
+    request_type = data.get("request_type", "general") # Default to 'general' if not specified
+    
     
     ticket_status = "Pending"
     request_time = datetime.now()
@@ -321,9 +325,11 @@ def create_ticket():
         return jsonify({"error": "User ID does not exist. Please provide a valid user."}), 400
 
     # Insert the ticket into the database
-    cur.execute(
-        "INSERT INTO tickets (user_id, software_name, ticket_status, request_time) VALUES (%s, %s, %s, %s) RETURNING ticket_id",
-        (user_id, software_name, ticket_status, request_time)
+
+    # SQL insert based on request type
+    insert_query ="""INSERT INTO tickets (user_id, software_name, ticket_status, request_time, request_type) VALUES (%s, %s, %s, %s, %s) RETURNING ticket_id"""
+
+    cur.execute(insert_query,(user_id, software_name, ticket_status, request_time, request_type)
     )
     ticket_id = cur.fetchone()[0]
     conn.commit()
@@ -333,6 +339,96 @@ def create_ticket():
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
 
+#GEN AI IMPLEMENTATION
+
+# Automated Response Generation
+
+# # Initialize the model pipeline
+# response_generator = pipeline("text-generation", model="gpt-3.5-turbo")
+
+# def generate_response(prompt):
+#     response = response_generator(prompt, max_length=100, num_return_sequences=1)
+#     return response[0]['generated_text']
+
+# @app.route('/generate_response', methods=['POST'])
+# def generate_ticket_response():
+#     data = request.json
+#     prompt = data.get('content')
+#     if prompt:
+#         response = generate_response(prompt)
+#         return jsonify({"response": response}), 200
+#     return jsonify({"error": "Content is required"}), 400
+
+
+
+# Dynamic Knowledge Base Creation
+
+# summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+
+# def create_knowledge_base_entry(tickets):
+#     clusters = KMeans(n_clusters=5).fit(tickets)  # Example with 5 clusters
+#     knowledge_base = {}
+#     for idx, cluster in enumerate(clusters):
+#         summary = summarizer(" ".join(cluster), max_length=150, min_length=40)
+#         knowledge_base[f'Cluster {idx}'] = summary[0]['summary_text']
+#     return knowledge_base
+
+# @app.route('/update_knowledge_base', methods=['POST'])
+# def update_knowledge_base():
+#     # Retrieve tickets from database here
+#     # Example: tickets = [ticket['content'] for ticket in get_all_tickets()]
+#     knowledge_base = create_knowledge_base_entry(tickets)
+#     # Store knowledge_base in your DB or file
+#     return jsonify({"message": "Knowledge base updated"}), 200
+
+
+# Contextual Ticket Summarization
+
+# def summarize_ticket_history(history_text):
+#     summary = summarizer(history_text, max_length=100, min_length=30)
+#     return summary[0]['summary_text']
+
+# @app.route('/summarize_ticket', methods=['POST'])
+# def summarize_ticket():
+#     data = request.json
+#     history = data.get('history')
+#     if history:
+#         summary = summarize_ticket_history(history)
+#         return jsonify({"summary": summary}), 200
+#     return jsonify({"error": "History content required"}), 400
+
+# Predictive Text Suggestions for Agents
+
+# def suggest_text(input_text):
+#     suggestion = response_generator(input_text, max_length=50)
+#     return suggestion[0]['generated_text']
+
+# @app.route('/text_suggestion', methods=['POST'])
+# def text_suggestion():
+#     data = request.json
+#     input_text = data.get('input')
+#     if input_text:
+#         suggestion = suggest_text(input_text)
+#         return jsonify({"suggestion": suggestion}), 200
+#     return jsonify({"error": "Input text required"}), 400
+
+# Ticket Categorization and Priority Setting
+
+# classifier = pipeline("text-classification", model="type-of-classifier-model")
+
+# def categorize_ticket(content):
+#     category = classifier(content)[0]['label']
+#     priority = 'High' if 'urgent' in content else 'Low'
+#     return category, priority
+
+# @app.route('/categorize_ticket', methods=['POST'])
+# def categorize_ticket_endpoint():
+#     data = request.json
+#     content = data.get('content')
+#     if content:
+#         category, priority = categorize_ticket(content)
+#         return jsonify({"category": category, "priority": priority}), 200
+#     return jsonify({"error": "Content required"}), 400
 
 
 if __name__ == '__main__':
