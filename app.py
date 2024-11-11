@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, jsonify,redirect, url_for, session
+from flask import Flask, render_template, request, jsonify,redirect, url_for, session, render_template_string
 from werkzeug.security import generate_password_hash,check_password_hash
-import hashlib
+import hashlib , uuid
 import time
 import jwt
 from datetime import datetime, timedelta
@@ -17,6 +17,8 @@ app = Flask(__name__)
 SECRET_KEY = "your_secret_key"  # Define your secret key
 
 app.secret_key = SECRET_KEY  # Set the secret key for session management
+
+mock_org_users = {"user1": "pass123"}
 
 # Database connection
 def get_db_connection():
@@ -296,6 +298,9 @@ def get_tickets():
 # API to submit a ticket
 @app.route('/api/tickets', methods=['POST'])
 def create_ticket():
+    # if not session.get("user_authenticated"):
+    #     return redirect(url_for("mock_org_login"))
+    
     data = request.get_json()  # Get JSON data from the request body
 
     user_id = data.get('user_id')  # Extract user_id from the JSON data
@@ -338,6 +343,47 @@ def create_ticket():
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
+
+#SECURE GATEWAY
+
+# @app.route("/mock_org_login", methods=["GET", "POST"])
+# def mock_org_login():
+#     # Render a simple HTML form for user login
+#     if request.method == "GET":
+#         return render_template_string("""
+#         <form method="POST">
+#             <label for="username">Username:</label>
+#             <input type="text" name="username" required>
+#             <label for="password">Password:</label>
+#             <input type="password" name="password" required>
+#             <button type="submit">Login</button>
+#         </form>
+#         """)
+
+#     # Process login form submission
+#     username = request.form.get("username")
+#     password = request.form.get("password")
+#     if username in mock_org_users and mock_org_users[username] == password:
+#         # Simulate an authorization code and redirect
+#         auth_code = str(uuid.uuid4())  # Generate a mock authorization code
+#         session["mock_auth_code"] = auth_code  # Store the code in the session
+#         print(f"Stored auth_code in session: {session.get('mock_auth_code')}")
+#         return redirect(url_for("callback", code=auth_code))
+#     else:
+#         return "Invalid credentials. Please try again.", 401
+    
+# @app.route("/callback")
+# def callback():
+#     # Check for the authorization code in the URL
+#     auth_code = request.args.get("code")
+#     if auth_code and auth_code == session.get("mock_auth_code"):
+#         # "Exchange" the code for an access token (simply set session data in this case)
+#         session["user_authenticated"] = True
+#         session["username"] = "user1"  # Mock user info
+#         return redirect(url_for("create_ticket"))  # Redirect to the ticket submission page
+#     else:
+#         return "Invalid authorization code", 400
+
 
 #GEN AI IMPLEMENTATION
 
