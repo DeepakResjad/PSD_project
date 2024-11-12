@@ -66,15 +66,38 @@
                             <!-- Submit Ticket Form -->
                             <form class="custom-form mt-4" id="ticketForm" method="POST">
                                 
+                                
+
                                 <div class="form-group mb-3">
                                     <label for="userId">User ID</label>
                                     <input type="number" class="form-control" id="userId" name="user_id" placeholder="Enter your User ID" required>
                                 </div>
 
                                 <div class="form-group mb-3">
+                                    <label for="requestType">Request Type</label>
+                                    <select class="form-control" id="requestType" name="request_type" required>
+                                        <option value="general">General</option>
+                                        <option value="license_retrieval">License Retrieval</option>
+                                        <option value="password_reset">Password Reset</option>
+                                    </select>
+                                </div>
+
+                                <!-- <div class="form-group mb-3">
                                     <label for="softwareName">Software Name</label>
                                     <input type="text" class="form-control" id="softwareName" name="software_name" placeholder="Enter software name" required>
+                                </div> -->
+
+                                <div class="form-group mb-3" id="licenseFields" style="display: none;">
+                                    <label for="softwareName">Software Name</label>
+                                    <input type="text" class="form-control" id="softwareName" name="software_name" placeholder="Enter software name">                               
+                                    
                                 </div>
+
+                                <div class="form-group mb-3" id="passwordResets" style="display: none;">
+                                    <label for="softwareName">Software Name</label>
+                                    <input type="text" class="form-control" id="softwareName" name="software_name" placeholder="Enter software name">                               
+                                </div>
+                            
 
                                 <div class="form-group mb-3">
                                     <label for="Description">Describe your issue:</label>
@@ -99,6 +122,14 @@
         <script src="static/js/bootstrap.bundle.min.js"></script>
         <script src="static/js/init.js"></script> -->
         <script>
+            document.getElementById('requestType').addEventListener('change', function() {
+                var licenseFields = document.getElementById('licenseFields');
+                licenseFields.style.display = this.value === 'license_retrieval' ? 'block' : 'none';
+
+                var passwordResets = document.getElementById('passwordResets');
+                passwordResets.style.display = this.value === 'password_reset' ? 'block' : 'none';
+            });
+
             $(document).ready(function() {
                 console.log('Document is ready');  // Check if the document is loaded
         
@@ -108,10 +139,12 @@
                     
                     // Get form data
                     const userId = $('#userId').val();
+                    const requestType = $('#requestType').val();
                     const softwareName = $('#softwareName').val();
                     const description = $('#Description').val();
         
                     console.log('User ID: ' + userId);  // Check if userId is being captured
+                    console.log('Request Type:' + requestType);
                     console.log('Software Name: ' + softwareName);  // Check if softwareName is being captured
                     console.log('Description: ' + description);  // Check if description is being captured
         
@@ -121,7 +154,8 @@
                         type: 'POST',
                         contentType: 'application/json',  // Ensure it's JSON
                         data: JSON.stringify({ 
-                            user_id: userId, 
+                            user_id: userId,
+                            request_type: requestType, 
                             software_name: softwareName,
                             message: description  // This is the ticket description/message
                         }),
@@ -133,6 +167,7 @@
                             console.log('Response:', response);  // Log the response from the server
                             alert('Ticket submitted successfully! Ticket ID: ' + response.ticket_id);
                             $('#ticketForm')[0].reset();  // Clear the form after successful submission
+                            $('#licenseFields').hide(); // Hide license fields after submission
                         },
                         error: function(error) {
                             console.log('AJAX request failed');  // Check if there's an error with the request

@@ -1,6 +1,6 @@
 import unittest
-import json
-from app import app, get_db_connection  
+import json,jwt
+from app import app, get_db_connection, generate_token, hash_secret
 
 class TicketingAppTests(unittest.TestCase):
 
@@ -20,8 +20,8 @@ class TicketingAppTests(unittest.TestCase):
     def create_test_data(self):
        
         with self.conn.cursor() as cur:
-            cur.execute("INSERT INTO users (username, passwordhash, role) VALUES (%s, %s, %s)", 
-                        ('testuser', 'hashed_password', 'user'))
+            cur.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)", 
+                        ('testuser','test@gmail.com' 'hashed_password'))
             self.conn.commit()
 
     def test_index(self):
@@ -85,6 +85,33 @@ class TicketingAppTests(unittest.TestCase):
 
     def test_get_tickets(self):
         response = self.app.get('/api/tickets')
+        self.assertEqual(response.status_code, 200)
+
+    def test_hash_secret(self):
+        secret = "mysecret"
+        hashed_secret = hash_secret(secret)
+        self.assertEqual(len(hashed_secret), 64)  # SHA256 produces a 64-character hash
+
+    # Test JWT token generation
+    def test_generate_token(self):
+        username = "testuser"
+        token = generate_token(username)
+        self.assertIsNotNone(token)
+
+        # Decode the token to ensure it has the correct payload
+        decoded = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        self.assertEqual(decoded['username'], username)
+
+    # Test protected route (example)
+    def test_protected_route_without_token(self):
+        response = self.app.get('/protected')  # Assuming there's a protected route
+        self.assertEqual(response.status_code, 401)  # Should return unauthorized
+
+    # Test protected route with token
+    def test_protected_route_with_token(self):
+        token = generate_token('testuser')
+        headers = {'Authorization': f'Bearer {token}'}
+        response = self.app.get('/protected', headers=headers)
         self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
