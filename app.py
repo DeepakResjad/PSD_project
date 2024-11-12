@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from transformers import pipeline
+import openai
+import os
 
 app = Flask(__name__)
 SECRET_KEY = "your_secret_key"  # Define your secret key
@@ -314,6 +316,39 @@ def create_ticket():
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
 
+
+
+openai.api_key = "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"
+
+# Home route to render the chatbot HTML page
+@app.route('/chat')
+def chatbot():
+    return render_template('chat.html')
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.json
+    message = data.get("message")
+
+    if not message:
+        return jsonify({"error": "No message provided"}), 400
+
+    try:
+        # Send the user message to OpenAI's API using the correct function
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant for a ticketing system."},
+                {"role": "user", "content": message}
+            ]
+        )
+        
+        # Extract the assistant's response
+        reply = response['choices'][0]['message']['content']
+        return jsonify({"reply": reply})
+    except Exception as e:
+        print(f"Error: {e}")  # Log the error for debugging
+        return jsonify({"reply": "I'm sorry, I couldn't process that."}), 500
 
 
 if __name__ == '__main__':
