@@ -317,35 +317,5 @@ def create_ticket():
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
 
 
-@app.route('/chat')
-def chatbot():
-    return render_template('chat.html')
-
-@app.route('/api/chat', methods=['POST'])
-def chat():
-    data = request.json
-    message = data.get("message")
-
-    if not message:
-        return jsonify({"error": "No message provided"}), 400
-
-    try:
-        # Send the user message to OpenAI's API using the correct function
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant for a ticketing system."},
-                {"role": "user", "content": message}
-            ]
-        )
-        
-        # Extract the assistant's response
-        reply = response['choices'][0]['message']['content']
-        return jsonify({"reply": reply})
-    except Exception as e:
-        print(f"Error: {e}")  # Log the error for debugging
-        return jsonify({"reply": "I'm sorry, I couldn't process that."}), 500
-
-
 if __name__ == '__main__':
     app.run(debug=True)
