@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 import hashlib , uuid
 import time
 import jwt
+import logging
 from datetime import datetime, timedelta
 import os, psycopg2
 from psycopg2.extras import RealDictCursor
@@ -167,6 +168,13 @@ def dashboard():
             return render_template('dashboard.html', username=username, email=email)
     else:
         return redirect(url_for('login_submit'))  # Redirect to login if user is not logged in
+
+# session security Enhancements
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+
+# logging and monitoring
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @app.route('/contact')
