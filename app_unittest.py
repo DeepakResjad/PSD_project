@@ -121,6 +121,12 @@ class TicketingAppTests(unittest.TestCase):
         self.assertIn(b'Dashboard', response.data)
         self.assertIn(b'Open Tickets', response.data)
         self.assertIn(b'Closed Tickets', response.data)
+    
+    def test_logout_redirects_to_login(self):
+        # Test the logout function redirects to the login page
+        response = self.app.get('/logout', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data)
 
 if __name__ == '__main__':
     unittest.main()
