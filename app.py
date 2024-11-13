@@ -193,7 +193,7 @@ def request_admin():
         return jsonify({"error": "Invalid user"}), 401
 
     # Verify user secret (password hash comparison)
-    if user['passwordhash'] != hash_secret(secret):
+    if user['password_hash'] != hash_secret(secret):
         return jsonify({"error": "Invalid secret"}), 401
 
     token = generate_token(username)
@@ -221,8 +221,8 @@ def grant_admin():
         cur = conn.cursor()
         
         cur.execute(
-            "UPDATE users SET role = %s, admin_granted_at = %s WHERE username = %s",
-            ('admin', datetime.now(), username)
+            "UPDATE users SET is_admin = %s WHERE username = %s",
+            ('admin', username)
         )
         conn.commit()
         
