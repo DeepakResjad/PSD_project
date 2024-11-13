@@ -65,7 +65,7 @@ def get_user(username):
     return user
 
 # Endpoint for homepage
-@app.route('/')
+@app.route('/chat')
 def index():
     return render_template('index.html')
 
@@ -317,34 +317,38 @@ def create_ticket():
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
 
 
-@app.route('/chat')
+@app.route('/')
 def chatbot():
     return render_template('chat.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
-    message = data.get("message")
+    data = request.get_json()
+    print("Received message:", data) 
+    message = data.get("message").lower().strip()  # Convert to lowercase and strip whitespace
 
     if not message:
         return jsonify({"error": "No message provided"}), 400
 
-    try:
-        # Send the user message to OpenAI's API using the correct function
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant for a ticketing system."},
-                {"role": "user", "content": message}
-            ]
-        )
-        
-        # Extract the assistant's response
-        reply = response['choices'][0]['message']['content']
-        return jsonify({"reply": reply})
-    except Exception as e:
-        print(f"Error: {e}")  # Log the error for debugging
-        return jsonify({"reply": "I'm sorry, I couldn't process that."}), 500
+    # Enhanced keyword-based logic for generating responses
+    if "create" in message or "ticket" in message:
+        response = "To create a ticket, please provide details such as the software name and issue description."
+    elif "status" in message and "ticket" in message:
+        response = "To check your ticket status, please provide your ticket ID."
+    elif "urgent" in message or "priority" in message:
+        response = "If your issue is urgent, I recommend marking it as high priority. Would you like to proceed?"
+    elif "login" in message or "password" in message:
+        response = "If you're having trouble logging in or need to reset your password, please visit the login page and select 'Forgot Password'."
+    elif "contact" in message or "support" in message:
+        response = "You can reach our support team via the Contact page or by calling our helpline during business hours."
+    elif "admin" in message or "privilege" in message:
+        response = "Admin privileges can be requested through your account settings or by contacting an administrator."
+    elif "thank" in message:
+        response = "You're very welcome! I'm here to help whenever you need it."
+    else:
+        response = "I'm here to help! Could you please clarify your request?"
+    print("Sending response:", response) 
+    return jsonify({"reply": response})
 
 
 if __name__ == '__main__':
