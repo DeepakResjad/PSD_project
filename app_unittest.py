@@ -113,6 +113,14 @@ class TicketingAppTests(unittest.TestCase):
         headers = {'Authorization': f'Bearer {token}'}
         response = self.app.get('/protected', headers=headers)
         self.assertEqual(response.status_code, 200)
+    
+    def test_dashboard_page(self):
+        # Test that the dashboard page loads successfully
+        response = self.app.get('/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Dashboard', response.data)
+        self.assertIn(b'Open Tickets', response.data)
+        self.assertIn(b'Closed Tickets', response.data)
 
 if __name__ == '__main__':
     unittest.main()
