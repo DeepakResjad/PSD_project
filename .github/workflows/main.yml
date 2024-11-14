@@ -36,6 +36,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: ticketing_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 11b09postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -52,6 +67,11 @@ jobs:
           pip install pytest  # Ensure pytest is installed in the test job as well
 
       - name: Run tests
+        env:
+          DB_HOST: localhost
+          DB_USER: postgres
+          DB_PASSWORD: 11b09postgres
+          DB_NAME: ticketing_db
         run: python -m pytest app_unittest.py  # Use `python -m pytest` to avoid path issues
 
   # deploy:
