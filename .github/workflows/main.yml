@@ -16,7 +16,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.8'
+
+      - name: Check Python Path and pytest Installation
+        run: |
+          python -m pip show pytest
+          which pytest
 
       - name: Install dependencies
         run: |
@@ -37,7 +42,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest app_unittest.py
+          python -m pytest app_unittest.py
           
   # deploy:
   #   runs-on: ubuntu-latest
