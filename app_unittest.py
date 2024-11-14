@@ -157,6 +157,33 @@ class TicketingAppTests(unittest.TestCase):
         decoded = jwt.decode(token, app.secret_key, algorithms=["HS256"])
         self.assertEqual(decoded['username'], username)
 
+
+    # Test protected route (example)
+    def test_protected_route_without_token(self):
+        response = self.app.get('/protected')  # Assuming there's a protected route
+        self.assertEqual(response.status_code, 401)  # Should return unauthorized
+
+    # Test protected route with token
+    def test_protected_route_with_token(self):
+        token = generate_token('testuser')
+        headers = {'Authorization': f'Bearer {token}'}
+        response = self.app.get('/protected', headers=headers)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_dashboard_page(self):
+        # Test that the dashboard page loads successfully
+        response = self.app.get('/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Dashboard', response.data)
+        self.assertIn(b'Open Tickets', response.data)
+        self.assertIn(b'Closed Tickets', response.data)
+    
+    def test_logout_redirects_to_login(self):
+        # Test the logout function redirects to the login page
+        response = self.app.get('/logout', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data)
+
     # # Test protected route (example)
     # def test_protected_route_without_token(self):
     #     response = self.app.get('/protected')  # Assuming there's a protected route
@@ -168,6 +195,7 @@ class TicketingAppTests(unittest.TestCase):
     #     headers = {'Authorization': f'Bearer {token}'}
     #     response = self.app.get('/protected', headers=headers)
     #     self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
