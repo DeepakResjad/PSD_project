@@ -5,23 +5,22 @@ from app import app, get_db_connection, generate_token, hash_secret
 class TicketingAppTests(unittest.TestCase):
 
     def setUp(self):
-        
         self.app = app.test_client()
         self.app.testing = True
-        
-        
         self.conn = get_db_connection()
+        self.conn.autocommit = False  # Disable autocommit to use transactions
         self.create_test_data()
 
     def tearDown(self):
-       
+        self.conn.rollback()  # Rollback all changes made in the test
         self.conn.close()
 
     def create_test_data(self):
        
         with self.conn.cursor() as cur:
+            cur.execute("DELETE FROM users WHERE email = %s", ('test@gmail.com',))
             cur.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)", 
-                        ('testuser','test@gmail.com' 'hashed_password'))
+                        ('testuser','test@gmail.com', hash_secret('test_secret')))
             self.conn.commit()
 
     def test_index(self):
@@ -38,26 +37,32 @@ class TicketingAppTests(unittest.TestCase):
 
     def test_request_admin(self):
         response = self.app.post('/api/request-admin', 
-                                 data=json.dumps({'username': 'testuser', 'secret': 'password'}), 
+                                 data=json.dumps({'username': 'testuser', 'secret': 'test_secret'}), 
                                  content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertIn('token', json.loads(response.data))
 
     def test_grant_admin(self):
         token_response = self.app.post('/api/request-admin', 
-                                        data=json.dumps({'username': 'testuser', 'secret': 'password'}), 
+                                        data=json.dumps({'username': 'testuser', 'secret': 'test_secret'}), 
                                         content_type='application/json')
-        token = json.loads(token_response.data)['token']
+        self.assertEqual(token_response.status_code, 200, f"Expected 200 OK, got {token_response.status_code} with response: {token_response.data}")
+        token_data = json.loads(token_response.data) 
+        token = token_data['token']
+
+        if not token:
+            self.fail(f"Token not found in response. Full response data: {token_response.data}")
 
         response = self.app.post('/api/grant-admin', 
                                  data=json.dumps({'token': token}), 
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Admin privileges granted', json.loads(response.data)['message'])
+        self.assertEqual(response.status_code, 200,f"Expected 200 OK but got {token_response.status_code} with response: {token_response.data}")
+        response_data = json.loads(response.data)
+        self.assertIn("Admin privileges granted", response_data.get("message", ""))
 
     def test_revoke_admin(self):
         token_response = self.app.post('/api/request-admin', 
-                                        data=json.dumps({'username': 'testuser', 'secret': 'password'}), 
+                                        data=json.dumps({'username': 'testuser', 'secret': 'test_secret'}), 
                                         content_type='application/json')
         token = json.loads(token_response.data)['token']
 
@@ -73,7 +78,7 @@ class TicketingAppTests(unittest.TestCase):
 
     def test_submit_ticket(self):
         token_response = self.app.post('/api/request-admin', 
-                                        data=json.dumps({'username': 'testuser', 'secret': 'password'}), 
+                                        data=json.dumps({'username': 'testuser', 'secret': 'test_secret'}), 
                                         content_type='application/json')
         token = json.loads(token_response.data)['token']
 
