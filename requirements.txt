@@ -1,5 +1,9 @@
-Flask==2.0.3
+Flask==1.1.2
 psycopg2-binary==2.9.1
 PyJWT==2.3.0
-Werkzeug==3.0.4
+Werkzeug==0.16.1
 transformers==4.45.2
+Jinja2==3.0.3
+itsdangerous==1.1.0
+pytest
+torch==1.12.1

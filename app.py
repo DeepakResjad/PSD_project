@@ -179,91 +179,91 @@ def favicon():
     return '', 204
 
 
-# API to request admin privileges
-@app.route('/api/request-admin', methods=['POST'])
-def request_admin():
-    data = request.json
-    username = data.get('username')
-    secret = data.get('secret')
+# # API to request admin privileges
+# @app.route('/api/request-admin', methods=['POST'])
+# def request_admin():
+#     data = request.json
+#     username = data.get('username')
+#     secret = data.get('secret')
 
-    # Fetch user from the database
-    user = get_user(username)
+#     # Fetch user from the database
+#     user = get_user(username)
     
-    if user is None:
-        return jsonify({"error": "Invalid user"}), 401
+#     if user is None:
+#         return jsonify({"error": "Invalid user"}), 401
 
-    # Verify user secret (password hash comparison)
-    if user['password_hash'] != hash_secret(secret):
-        return jsonify({"error": "Invalid secret"}), 401
+#     # Verify user secret (password hash comparison)
+#     if user['password_hash'] != hash_secret(secret):
+#         return jsonify({"error": "Invalid secret"}), 401
 
-    token = generate_token(username)
-    return jsonify({"message": "Admin token generated", "token": token}), 200
+#     token = generate_token(username)
+#     return jsonify({"message": "Admin token generated", "token": token}), 200
 
-# API to grant admin privileges
-@app.route('/api/grant-admin', methods=['POST'])
-def grant_admin():
-    data = request.json
-    token = data.get('token')
+# # API to grant admin privileges
+# @app.route('/api/grant-admin', methods=['POST'])
+# def grant_admin():
+#     data = request.json
+#     token = data.get('token')
 
-    username = verify_token(token)
+#     username = verify_token(token)
 
-    if not username:
-        return jsonify({"error": "Invalid or expired token"}), 401
+#     if not username:
+#         return jsonify({"error": "Invalid or expired token"}), 401
 
-    user = get_user(username)
+#     user = get_user(username)
 
-    if user is None:
-        return jsonify({"error": "Invalid user"}), 401
+#     if user is None:
+#         return jsonify({"error": "Invalid user"}), 401
 
-    # Criteria to grant admin privileges (e.g., time check)
-    if time.localtime().tm_hour in range(9, 18):  # Only allow during office hours
-        conn = get_db_connection()
-        cur = conn.cursor()
+#     # Criteria to grant admin privileges (e.g., time check)
+#     if time.localtime().tm_hour in range(9, 18):  # Only allow during office hours
+#         conn = get_db_connection()
+#         cur = conn.cursor()
         
-        cur.execute(
-            "UPDATE users SET is_admin = %s WHERE username = %s",
-            ('admin', username)
-        )
-        conn.commit()
+#         cur.execute(
+#             "UPDATE users SET is_admin = 'admin' WHERE username = %s",
+#             (True, username)
+#         )
+#         conn.commit()
         
-        cur.close()
-        conn.close()
+#         cur.close()
+#         conn.close()
 
-        log_admin_action(username, 'Granted Admin Privileges')
-        return jsonify({"message": f"Admin privileges granted to {username}"}), 200
-    else:
-        return jsonify({"error": "Request outside of allowed time window"}), 403
+#         log_admin_action(username, 'Granted Admin Privileges')
+#         return jsonify({"message": f"Admin privileges granted to {username}"}), 200
+#     else:
+#         return jsonify({"error": "Request outside of allowed time window"}), 403
 
-# API to revoke admin privileges
-@app.route('/api/revoke-admin', methods=['POST'])
-def revoke_admin():
-    data = request.json
-    token = data.get('token')
+# # API to revoke admin privileges
+# @app.route('/api/revoke-admin', methods=['POST'])
+# def revoke_admin():
+#     data = request.json
+#     token = data.get('token')
 
-    username = verify_token(token)
+#     username = verify_token(token)
 
-    if not username:
-        return jsonify({"error": "Invalid or expired token"}), 401
+#     if not username:
+#         return jsonify({"error": "Invalid or expired token"}), 401
 
-    user = get_user(username)
+#     user = get_user(username)
 
-    if user is None or user['role'] != 'admin':
-        return jsonify({"error": "User is not an admin"}), 400
+#     if user is None or user['role'] != 'admin':
+#         return jsonify({"error": "User is not an admin"}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+#     conn = get_db_connection()
+#     cur = conn.cursor()
 
-    cur.execute(
-        "UPDATE users SET role = %s, admin_granted_at = %s WHERE username = %s",
-        ('user', None, username)
-    )
-    conn.commit()
+#     cur.execute(
+#         "UPDATE users SET role = %s, admin_granted_at = %s WHERE username = %s",
+#         ('user', None, username)
+#     )
+#     conn.commit()
     
-    cur.close()
-    conn.close()
+#     cur.close()
+#     conn.close()
 
-    log_admin_action(username, 'Revoked Admin Privileges')
-    return jsonify({"message": f"Admin privileges revoked from {username}"}), 200
+#     log_admin_action(username, 'Revoked Admin Privileges')
+#     return jsonify({"message": f"Admin privileges revoked from {username}"}), 200
 
 # Load Hugging Face sentiment analysis model
 sentiment_analysis = pipeline(task="sentiment-analysis", model="SamLowe/roberta-base-go_emotions")
