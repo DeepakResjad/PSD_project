@@ -199,6 +199,13 @@ def request_admin():
     token = generate_token(username)
     return jsonify({"message": "Admin token generated", "token": token}), 200
 
+@app.route('/logout')
+def logout():
+    # Clear session data to log the user out
+    session.clear()
+    # Redirect to login page (assuming you have a login route)
+    return redirect(url_for('login_page'))
+
 # API to grant admin privileges
 @app.route('/api/grant-admin', methods=['POST'])
 def grant_admin():
