@@ -23,10 +23,10 @@ mock_org_users = {"user1": "pass123"}
 # Database connection
 def get_db_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="ticketing_db",
-        user="postgres",
-        password="11b09postgres"
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "11b09postgres"),
+        dbname=os.getenv("DB_NAME", "ticketing_db")
     )
     return conn
 
@@ -117,6 +117,32 @@ def login_page():
 @app.route('/MyTickets')
 def my_tickets_page():
     return render_template('MyTickets.html')
+
+@app.route('/ticket_details')
+def my_ticket_details():
+    return render_template('ticketdetails.html')
+
+@app.route('/ticket_details/<int:ticket_id>')
+def ticket_details(ticket_id):
+    # Retrieve the ticket details from the database
+    ticket = get_ticket_by_id(ticket_id)  # Implement this function to fetch ticket data
+    print(ticket)
+    return render_template('ticketdetails.html', ticket=ticket)
+
+def get_ticket_by_id(ticket_id):
+    conn = get_db_connection()  # Get a database connection
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            # Query to fetch details for a specific ticket
+            cursor.execute("SELECT * FROM tickets WHERE ticket_id = %s", (ticket_id,))
+            ticket = cursor.fetchone()  # Fetch the single ticket record
+        return ticket
+    except Exception as e:
+        print(f"Error fetching ticket details: {e}")
+        return None
+    finally:
+        conn.close()  # Ensure the connection is closed after query
+
 
 @app.route('/CreateTicket', methods=['POST','GET'])
 def create_ticket_page():
