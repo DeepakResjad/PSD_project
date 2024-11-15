@@ -529,7 +529,7 @@ def chat():
 
 user_data = {}
 
-@app.route('/')
+@app.route('/chat')
 def chatbot():
     return render_template('chat.html')
 
