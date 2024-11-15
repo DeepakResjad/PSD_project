@@ -112,7 +112,7 @@
                     tickets.forEach(function(ticket) {
                       tbody.append(`
                         <tr>
-                          <th scope="row">${ticket.ticket_id}</th>
+                          <th scope="row"><a href="/ticket_details/${ticket.ticket_id}" target="_blank">${ticket.ticket_id}</a></th>
                           <td>${ticket.user_id}</td>
                           <td>${ticket.software_name}</td>
                           <td>${ticket.ticket_status}</td>

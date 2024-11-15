@@ -3,30 +3,77 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Chatbot interface for the Ticketing System">
-    <title>Chatbot | Ticketing System</title>
 
-    <!-- CSS Files -->
+    <title>Ticketing System | Chatbot</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap and Custom CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet">
     <link href="../static/css/chatbot.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-dark text-light d-flex flex-column vh-100">
 
-    <!-- Chatbot Widget -->
-    <div id="chatbot-widget">
-        <div id="chatbot-button" onclick="toggleChat()">💬 Chat with us</div>
-        <div id="chatbot-container" class="d-none">
-            <div id="chat-header">Ticketing Assistant <span onclick="toggleChat()" class="close-btn">&times;</span></div>
-            <div id="chat-content">
-                <div id="chat-messages"></div>
-            </div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="if(event.keyCode === 13) sendMessage()">
-                <button onclick="sendMessage()">Send</button>
+    <!-- Navbar -->
+    <header class="bg-dark text-light py-3">
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col d-flex align-items-center">
+                    <a href="/" class="d-flex align-items-center text-decoration-none text-light">
+                        <i class="bi-ticket-perforated me-2"></i>
+                        <span class="fw-bold">Ticketing System</span>
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="/" class="btn btn-outline-light btn-sm">Back to Home</a>
+                </div>
             </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Chat Section -->
+    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-12">
+                    <div id="chatbot-container" class="card bg-dark border-light rounded-4">
+                        <!-- Chat Header -->
+                        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Ticketing Assistant</h5>
+                            <button type="button" class="btn-close btn-close-white" onclick="closeChat()" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Chat Messages Area -->
+                        <div id="chat-content" class="card-body overflow-auto" style="height: 60vh;">
+                            <div id="chat-messages"></div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="card-footer bg-secondary p-3">
+                            <div class="input-group">
+                                <input type="text" id="chat-input" class="form-control bg-dark text-light rounded-pill" placeholder="Type your message..." 
+                                       onkeypress="if(event.keyCode === 13) sendMessage()" aria-label="Message">
+                                <button class="btn btn-accent rounded-pill" onclick="sendMessage()">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light text-center py-3">
+        <small>&copy; 2024 Ticketing System. All Rights Reserved.</small>
+    </footer>
 
     <!-- JavaScript Files -->
-    <script src="../static/js/chatbot.js"></script> <!-- Chatbot functionality JS -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script> <!-- Chatbot functionality JS -->
 </body>
 </html>
