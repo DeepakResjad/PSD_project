@@ -7,3 +7,4 @@ Jinja2==3.0.3
 itsdangerous==1.1.0
 pytest
 torch==1.12.1
+openai==1.54.4
