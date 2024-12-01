@@ -524,15 +524,21 @@ def chat():
         except ValueError:
             return jsonify({"response": "Invalid date format. Please enter in YYYY-MM-DD format."})
 
+    if message[5].isdigit() and message[0].isdigit() and len(message) == 6:
+        if int(message) == session["otp"]:
+            return jsonify({"response": "OTP verified. Please type in your new password in this format 'p:' followed by your new password."})
+        else:
+            return jsonify({"response": "Invalid OTP. Please try again. Type 'reset password' or 'download certificate' to proceed."})
+        
     # Process the requests based on the action required
-    if "reset password" in message:
+    if "reset" in message and "password" in message:
         session["action"] = "reset_password"
         
         # Generate OTP and send
         otp_message = generate_and_send_otp(session["email"])
         if otp_message:
             session["otp"] = otp_message
-            return jsonify({"response": f"{otp_message}. Please enter the OTP sent to your email."})
+            return jsonify({"response": f"Please enter the OTP sent to your email."})
         else:
             return jsonify({"response": "Failed to send OTP. Please try again later."})
 
