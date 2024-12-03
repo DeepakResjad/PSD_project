@@ -64,28 +64,20 @@ def generate_and_send_otp(email):
         return None
 
 # Password reset function
-def reset_password(email):
-    otp = generate_and_send_otp(email)
-    if not otp:
-        print("OTP generation failed. Please try again.")
-        return
+def reset_password(email,new_password):
+    new_password = new_password
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE users SET password = %s WHERE email = %s", (new_password, email))
+        conn.commit()
+        print("Password has been reset successfully.")
+    except Exception as e:
+        print(f"Failed to reset password: {e}")
+    finally:
 
-    user_otp = int(input("Enter the OTP sent to your email: "))
-    if user_otp == otp:
-        new_password = input("Enter new password: ")
-        conn = get_db_connection()
-        cur = conn.cursor()
-        try:
-            cur.execute("UPDATE users SET password = %s WHERE email = %s", (new_password, email))
-            conn.commit()
-            print("Password has been reset successfully.")
-        except Exception as e:
-            print(f"Failed to reset password: {e}")
-        finally:
-            cur.close()
-            conn.close()
-    else:
-        print("Invalid OTP. Please try again.")
+        cur.close()
+        conn.close()
 
 # Selenium login function
 def login_and_download_cert(username, password):
@@ -109,20 +101,6 @@ def login_and_download_cert(username, password):
     finally:
         driver.quit()
 
-if __name__ == "__main__":
-    choice = input("Enter '1' to log in and download certificate or '2' to reset password: ")
-    if choice == '1':
-        fullname = input("Enter Full Name: ")
-        dob = input("Enter Date of Birth (YYYY-MM-DD): ")
-        email = input("Enter Email ID: ")
-        user = get_user_credentials(fullname, dob, email)
-        if user:
-            username, password = user
-            login_and_download_cert(username, password)
-        else:
-            print("User not found or credentials do not match.")
-    elif choice == '2':
-        email = input("Enter your Email ID for password reset: ")
-        reset_password(email)
-    else:
-        print("Invalid choice.")
+# Main function
+def main():
+    reset_password("reddydeepak771@gmail.com","new_password")

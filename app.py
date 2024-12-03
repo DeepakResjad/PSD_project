@@ -524,6 +524,10 @@ def chat():
         except ValueError:
             return jsonify({"response": "Invalid date format. Please enter in YYYY-MM-DD format."})
 
+    if "p:" in message :
+        reset_password(session["email"],message[2:])
+        return jsonify({"response": "Password updated successfully. Please type 'reset password' or 'download certificate' to proceed."})
+    
     if message[5].isdigit() and message[0].isdigit() and len(message) == 6:
         if int(message) == session["otp"]:
             return jsonify({"response": "OTP verified. Please type in your new password in this format 'p:' followed by your new password."})
@@ -533,14 +537,21 @@ def chat():
     # Process the requests based on the action required
     if "reset" in message and "password" in message:
         session["action"] = "reset_password"
-        
-        # Generate OTP and send
-        otp_message = generate_and_send_otp(session["email"])
-        if otp_message:
-            session["otp"] = otp_message
-            return jsonify({"response": f"Please enter the OTP sent to your email."})
-        else:
-            return jsonify({"response": "Failed to send OTP. Please try again later."})
+        try:
+            user = get_user_credentials(session["fullname"], session["dob"], session["email"])
+            if user :
+            # Generate OTP and send
+                otp_message = generate_and_send_otp(session["email"])
+                if otp_message:
+                    session["otp"] = otp_message
+                    return jsonify({"response": f"Please enter the OTP sent to your email."})
+                else:
+                    return jsonify({"response": "Failed to send OTP. Please try again later."})
+            else:
+                return jsonify({"response": "User not found or credentials do not match."})
+            
+        except Exception as e:
+            return jsonify({"response": "An error occurred while processing your request."})
 
     elif "download certificate" in message:
         session["action"] = "download_certificate"
