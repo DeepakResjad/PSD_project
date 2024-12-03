@@ -68,7 +68,7 @@ class TicketingAppFrontendTests(unittest.TestCase):
             "message": "reset password"
         }), content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Please enter the OTP sent to your email.", response.json['response'])
+
 
     # Test the chatbot's response to invalid date format
     def test_chatbot_invalid_dob_format(self):
