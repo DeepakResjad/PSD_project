@@ -3,12 +3,6 @@ import random
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 # Database connection
@@ -79,28 +73,41 @@ def reset_password(email,new_password):
         cur.close()
         conn.close()
 
-# Selenium login function
-def login_and_download_cert(username, password):
-    options = Options()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
+def retrieve_certificate(username, password):
+    conn = get_db_connection()
+    cur = conn.cursor()
     try:
-        driver.get("http://dummywebsite.com/login")
-        driver.find_element(By.NAME, "username").send_keys(username)
-        driver.find_element(By.NAME, "password").send_keys(password)
-        driver.find_element(By.NAME, "password").send_keys(Keys.RETURN)
+        # Verify user credentials
+        cur.execute("SELECT id FROM users WHERE username = %s AND password = %s", (username, password))
+        user = cur.fetchone()
 
-        time.sleep(2)
-        
-        driver.find_element(By.ID, "download_certificate").click()
-
-        print("Certificate download initiated.")
+        if user:
+            user_id = user[0]
+            # Fetch certificate for the user
+            cur.execute("SELECT certificate_path FROM certificates WHERE user_id = %s", (user_id,))
+            cert = cur.fetchone()
+            
+            if cert:
+                certificate_path = cert[0]
+                print("Certificate retrieved successfully.")
+                return certificate_path
+            else:
+                print("No certificate found for this user.")
+                return None
+        else:
+            print("Invalid username or password.")
+            return None
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred while retrieving the certificate: {e}")
+        return None
     finally:
-        driver.quit()
+        cur.close()
+        conn.close()
 
-# Main function
-def main():
-    reset_password("reddydeepak771@gmail.com","new_password")
+# Example usage of the function
+def login_and_download_cert(username, password):
+    certificate_path = retrieve_certificate(username, password)
+    if certificate_path:
+        return f"Certificate path: {certificate_path}"
+    else:
+        return "Failed to retrieve certificate."
