@@ -26,10 +26,10 @@ mock_org_users = {"user1": "pass123"}
 # Database connection
 def get_db_connection():
     conn = psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", "11b09postgres"),
-        dbname=os.getenv("DB_NAME", "ticketing_db")
+        host="localhost",
+        database="ticketing_db",
+        user="postgres",
+        password="11b09postgres"
     )
     return conn
 
@@ -120,32 +120,6 @@ def login_page():
 @app.route('/MyTickets')
 def my_tickets_page():
     return render_template('MyTickets.html')
-
-@app.route('/ticket_details')
-def my_ticket_details():
-    return render_template('ticketdetails.html')
-
-@app.route('/ticket_details/<int:ticket_id>')
-def ticket_details(ticket_id):
-    # Retrieve the ticket details from the database
-    ticket = get_ticket_by_id(ticket_id)  # Implement this function to fetch ticket data
-    print(ticket)
-    return render_template('ticketdetails.html', ticket=ticket)
-
-def get_ticket_by_id(ticket_id):
-    conn = get_db_connection()  # Get a database connection
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            # Query to fetch details for a specific ticket
-            cursor.execute("SELECT * FROM tickets WHERE ticket_id = %s", (ticket_id,))
-            ticket = cursor.fetchone()  # Fetch the single ticket record
-        return ticket
-    except Exception as e:
-        print(f"Error fetching ticket details: {e}")
-        return None
-    finally:
-        conn.close()  # Ensure the connection is closed after query
-
 
 @app.route('/CreateTicket', methods=['POST','GET'])
 def create_ticket_page():
@@ -588,105 +562,18 @@ def get_ticket_counts():
 #     return jsonify({"error": "Content required"}), 400
 
 
-openai.api_key = "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"
-
 # Home route to render the chatbot HTML page
+
+user_data = {}
+
 @app.route('/chat')
 def chatbot():
     return render_template('chat.html')
 
-# @app.route('/api/chat', methods=['POST'])
-# def chat():
-#     data = request.json
-#     message = data.get("message")
-
-#     if not message:
-#         return jsonify({"error": "No message provided"}), 400
-
-#     try:
-#         # Send the user message to OpenAI's API using the correct function
-#         response = openai.ChatCompletion.create(
-#             model="gpt-3.5-turbo",
-#             messages=[
-#                 {"role": "system", "content": "You are a helpful assistant for a ticketing system."},
-#                 {"role": "user", "content": message}
-#             ]
-#         )
-        
-#         # Extract the assistant's response
-#         reply = response['choices'][0]['message']['content']
-#         return jsonify({"reply": reply})
-#     except Exception as e:
-#         print(f"Error: {e}")  # Log the error for debugging
-#         return jsonify({"reply": "I'm sorry, I couldn't process that."}), 500
-
-
-# user_data = {}
-
-
-# @app.route('/api/chat', methods=['POST'])
-# def chat():
-#     data = request.json
-#     message = data.get("message").lower().strip()
-
-#     # Check if session data already exists
-#     if "fullname" not in session:
-#         session["fullname"] = message
-#         return jsonify({"response": "Thank you! Can I have your email address?"})
-
-#     if "email" not in session:
-#         session["email"] = message
-#         return jsonify({"response": "Thank you! Lastly, may I have your date of birth (YYYY-MM-DD)?"})
-
-#     if "dob" not in session:
-#         try:
-#             datetime.strptime(message, "%Y-%m-%d")  # Validate DOB format
-#             session["dob"] = message
-#             return jsonify({"response": "Thank you for the details! Type 'reset password' or 'download certificate' to proceed."})
-#         except ValueError:
-#             return jsonify({"response": "Invalid date format. Please enter in YYYY-MM-DD format."})
-
-#     # Process the requests based on the action required
-#     if "reset password" in message:
-#         session["action"] = "reset_password"
-        
-#         # Generate OTP and send
-#         otp_message = generate_and_send_otp(session["email"])
-#         if otp_message:
-#             session["otp"] = otp_message
-#             return jsonify({"response": f"{otp_message}. Please enter the OTP sent to your email."})
-#         else:
-#             return jsonify({"response": "Failed to send OTP. Please try again later."})
-
-#     elif "download certificate" in message:
-#         session["action"] = "download_certificate"
-
-#         # Fetch user credentials and initiate download
-#         user = get_user_credentials(session["fullname"], session["dob"], session["email"])
-#         if user:
-#             username, password = user
-#             result = login_and_download_cert(username, password)
-#             session.clear()  # Clear session data after completion
-#             return jsonify({"response": result})
-#         else:
-#             session.clear()
-#             return jsonify({"response": "User not found or credentials do not match."})
-
-#     # Default responses for greetings or unrecognized inputs
-#     if "hi" in message or "hello" in message:
-#         return jsonify({"response": "Hello! How can I assist you today?"})
-#     elif "thank you" in message or "thanks" in message:
-#         return jsonify({"response": "You're welcome!"})
-#     elif "bye" in message or "goodbye" in message:
-#         return jsonify({"response": "Goodbye! Have a great day!"})
-
-#     # Catch-all response if message doesn't fit criteria
-#     return jsonify({"response": "Please specify your request: 'reset password' or 'download certificate'."})
-
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
-    message = data.get("message").lower().strip()  # Ensure message is processed
+    message = data.get("message").lower().strip()
 
     # Check if session data already exists
     if "fullname" not in session:
@@ -705,7 +592,7 @@ def chat():
         except ValueError:
             return jsonify({"response": "Invalid date format. Please enter in YYYY-MM-DD format."})
 
-    # Process specific requests based on the action
+    # Process the requests based on the action required
     if "reset password" in message:
         session["action"] = "reset_password"
         
@@ -741,7 +628,6 @@ def chat():
 
     # Catch-all response if message doesn't fit criteria
     return jsonify({"response": "Please specify your request: 'reset password' or 'download certificate'."})
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
