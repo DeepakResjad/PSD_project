@@ -341,26 +341,24 @@ def get_tickets():
 # API to submit a ticket
 @app.route('/api/tickets', methods=['POST'])
 def create_ticket():
-    # if not session.get("user_authenticated"):
-    #     return redirect(url_for("mock_org_login"))
-    
     data = request.get_json()  # Get JSON data from the request body
 
     user_id = data.get('user_id')  # Extract user_id from the JSON data
     software_name = data.get('software_name')  # Extract software_name from the JSON data
     ticket_message = data.get('message')  # The description or message
-    request_type = data.get("request_type", "general") # Default to 'general' if not specified
-    
-    
-    ticket_status = "Pending"
+    request_type = data.get("request_type", "general")  # Default to 'general' if not specified
+
+    # Default values for ticket status and priority
+    ticket_status = "Open"  # Status is now either "Open" or "Closed"
     request_time = datetime.now()
 
     # Sentiment analysis logic
     sentiment_result = sentiment_analysis(ticket_message)
     sentiment_label = sentiment_result[0]['label']  # Sentiment result (e.g., 'POSITIVE', 'NEGATIVE')
 
+    # Set ticket priority based on sentiment analysis
     negative_emotions = ['anger', 'sadness', 'grief', 'disgust', 'disappointment', 'worry', 'annoyance', 'disapproval', 'remorse', 'fear', 'confusion']
-    ticket_status = "Urgent" if sentiment_label.lower() in negative_emotions else "Low"
+    ticket_priority = "Urgent" if sentiment_label.lower() in negative_emotions else "Low"
 
     conn = get_db_connection()
     cur = conn.cursor()
@@ -373,12 +371,12 @@ def create_ticket():
         return jsonify({"error": "User ID does not exist. Please provide a valid user."}), 400
 
     # Insert the ticket into the database
-
-    # SQL insert based on request type
-    insert_query ="""INSERT INTO tickets (user_id, software_name, ticket_status, request_time, request_type) VALUES (%s, %s, %s, %s, %s) RETURNING ticket_id"""
-
-    cur.execute(insert_query,(user_id, software_name, ticket_status, request_time, request_type)
-    )
+    insert_query = """
+        INSERT INTO tickets (user_id, software_name, ticket_status, ticket_priority, request_time, request_type)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        RETURNING ticket_id
+    """
+    cur.execute(insert_query, (user_id, software_name, ticket_status, ticket_priority, request_time, request_type))
     ticket_id = cur.fetchone()[0]
     conn.commit()
 
@@ -386,6 +384,76 @@ def create_ticket():
     conn.close()
 
     return jsonify({"message": "Ticket submitted successfully", "ticket_id": ticket_id}), 201
+
+@app.route('/api/tickets/<int:ticket_id>/status', methods=['PATCH'])
+def update_ticket_status(ticket_id):
+    data = request.get_json()  # Get the JSON data from the request body
+    new_status = data.get('ticket_status')  # Extract the new status (e.g., "Closed")
+
+    if new_status not in ["Open", "Closed"]:
+        return jsonify({"error": "Invalid status. Status must be 'Open' or 'Closed'."}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Check if the ticket exists
+    cur.execute("SELECT COUNT(*) FROM tickets WHERE ticket_id = %s", (ticket_id,))
+    ticket_exists = cur.fetchone()[0]
+
+    if ticket_exists == 0:
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Ticket ID does not exist."}), 404
+
+    # Update the ticket's status
+    update_query = "UPDATE tickets SET ticket_status = %s WHERE ticket_id = %s"
+    cur.execute(update_query, (new_status, ticket_id))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return jsonify({"message": f"Ticket status updated to '{new_status}'."}), 200
+
+
+@app.route('/api/ticket_counts', methods=['GET'])
+def get_ticket_counts():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        # Query to get counts of tickets grouped by status
+        cur.execute("SELECT ticket_status, COUNT(*) FROM tickets GROUP BY ticket_status")
+        ticket_counts = cur.fetchall()
+
+        # Prepare ticket counts in a structured format
+        counts = {
+            'open': 0,
+            'closed': 0,
+            'in_progress': 0,
+            'resolved': 0
+        }
+
+        for status, count in ticket_counts:
+            if status == "Open":
+                counts['open'] = count
+            elif status == "Closed":
+                counts['closed'] = count
+            elif status == "In Progress":
+                counts['in_progress'] = count
+            elif status == "Resolved":
+                counts['resolved'] = count
+
+        return jsonify(counts), 200
+
+    except Exception as e:
+        print(f"Error fetching ticket counts: {e}")
+        return jsonify({"error": "Unable to fetch ticket counts"}), 500
+
+    finally:
+        cur.close()
+        conn.close()
+
 
 #SECURE GATEWAY
 
