@@ -76,6 +76,7 @@ function collectUserInfo(input) {
         displayMessage(`Nice to meet you, ${userInfo.name}! Could I have your email address?`, 'bot');
     } else if (!userInfo.email) {
         userInfo.email = input;
+        console.log('User info:', userInfo);
         displayMessage("Thank you! How can I help you today?", 'bot');
         sessionStorage.setItem('userInfo', JSON.stringify(userInfo)); // Store info in session
         isInfoCollected = true; // Mark info as collected

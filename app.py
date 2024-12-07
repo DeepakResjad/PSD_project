@@ -505,30 +505,28 @@ def chatbot():
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.json
+    userInfo = data.get("userInfo")
     message = data.get("message").lower().strip()
-
+    print("session", session)
     # Check if session data already exists
-    if "fullname" not in session:
-        session["fullname"] = message
+    if "name"  in userInfo:
+        session["name"] = userInfo["name"]
+    else:
+        session["name"] = message
+        print("session", session)
         return jsonify({"response": "Thank you! Can I have your email address?"})
-
-    if "email" not in session:
+    if "email"  in userInfo:
+        session["email"] = userInfo["email"]
+    else: 
         session["email"] = message
+        print("email",session["email"])
         return jsonify({"response": "Thank you! Lastly, may I have your date of birth (YYYY-MM-DD)?"})
-
-    if "dob" not in session:
-        try:
-            datetime.strptime(message, "%Y-%m-%d")  # Validate DOB format
-            session["dob"] = message
-            return jsonify({"response": "Thank you for the details! Type 'reset password' or 'download certificate' to proceed."})
-        except ValueError:
-            return jsonify({"response": "Invalid date format. Please enter in YYYY-MM-DD format."})
 
     if "p:" in message :
         reset_password(session["email"],message[2:])
         return jsonify({"response": "Password updated successfully. Please type 'reset password' or 'download certificate' to proceed."})
     
-    if message[5].isdigit() and message[0].isdigit() and len(message) == 6:
+    if message[3].isdigit() and message[0].isdigit() and len(message) == 6:
         if int(message) == session["otp"]:
             return jsonify({"response": "OTP verified. Please type in your new password in this format 'p:' followed by your new password."})
         else:
@@ -537,35 +535,31 @@ def chat():
     # Process the requests based on the action required
     if "reset" in message and "password" in message:
         session["action"] = "reset_password"
-        try:
-            user = get_user_credentials(session["fullname"], session["dob"], session["email"])
-            if user :
-            # Generate OTP and send
-                otp_message = generate_and_send_otp(session["email"])
-                if otp_message:
-                    session["otp"] = otp_message
-                    return jsonify({"response": f"Please enter the OTP sent to your email."})
-                else:
-                    return jsonify({"response": "Failed to send OTP. Please try again later."})
-            else:
-                return jsonify({"response": "User not found or credentials do not match."})
-            
-        except Exception as e:
-            return jsonify({"response": "An error occurred while processing your request."})
+        print("email reset",session["email"])
+        otp_message = generate_and_send_otp(session["email"])
+        if otp_message:
+            session["otp"] = otp_message
+            return jsonify({"response": f"Please enter the OTP sent to your email."})
+        else:
+            return jsonify({"response": "Failed to send OTP. Please try again later."})
 
     elif "download certificate" in message:
         session["action"] = "download_certificate"
 
-        # Fetch user credentials and initiate download
-        user = get_user_credentials(session["fullname"], session["dob"], session["email"])
-        if user:
-            username, password = user
-            result = login_and_download_cert(username, password)
-            session.clear()  # Clear session data after completion
-            return jsonify({"response": result})
-        else:
+        try:
+            user = get_user_credentials(session["fullname"], session["dob"], session["email"])
+            if user:
+                username, password = user
+                result = login_and_download_cert(username, password)
+                session.clear()  # Clear session data after completion
+                return jsonify({"response": result})
+            else:
+                session.clear()
+                return jsonify({"response": "User not found or credentials do not match."})
+
+        except Exception as e:
             session.clear()
-            return jsonify({"response": "User not found or credentials do not match."})
+            return jsonify({"response": "An error occurred while processing your request."})
 
     # Default responses for greetings or unrecognized inputs
     if "hi" in message or "hello" in message:
